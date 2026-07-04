@@ -1,0 +1,26 @@
+{
+  "name": "aldanat-quality-intelligence",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Aldanat Quality Intelligence (AQI) — staff quality performance platform for Aldanat Care (residential, supported living and outreach services for adults with learning disabilities).",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c cyan,magenta \"npm run dev --workspace server\" \"npm run dev --workspace client\"",
+    "seed": "npm run seed --workspace server",
+    "build": "npm run build --workspace server && npm run build --workspace client",
+    "start": "npm run start --workspace server",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "concurrently": "^9.1.0",
+    "eslint": "^9.17.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "globals": "^15.14.0",
+    "typescript-eslint": "^8.19.0"
+  }
+}

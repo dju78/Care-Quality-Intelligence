@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink: #12333a;
+  --petrol: #0f5257;
+  --sage: #5f9678;
+  --amber: #d9a441;
+  --rust: #bf4a36;
+  --mist: #f3f6f5;
+}
+
+@layer base {
+  html {
+    font-family: "Inter", system-ui, sans-serif;
+    color: var(--ink);
+    background-color: var(--mist);
+  }
+  h1, h2, h3, .font-display {
+    font-family: "Sora", "Inter", system-ui, sans-serif;
+  }
+  /* Visible, consistent focus for keyboard users */
+  :focus-visible {
+    outline: 3px solid #0f5257;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  ::selection {
+    background: #d2e5e5;
+  }
+}
+
+@layer utilities {
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- print (supervision pack & CQC evidence export) ---------- */
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm 12mm;
+  }
+  html, body {
+    background: #fff !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-page {
+    box-shadow: none !important;
+    border: none !important;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .print-break {
+    break-before: page;
+  }
+  .avoid-break {
+    break-inside: avoid;
+  }
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+}

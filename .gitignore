@@ -1,0 +1,10 @@
+node_modules/
+dist/
+server/data/*.db
+server/data/*.db-journal
+*.log
+.DS_Store
+.env
+
+# Local installer / binaries not part of the project
+Claude Setup.exe
