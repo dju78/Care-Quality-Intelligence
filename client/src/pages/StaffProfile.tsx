@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api, dateLabel, monthLabel, prefersReducedMotion, useApi } from "../api";
-import { Card, EmptyState, ErrorNote, RagBadge, SectionHeading, SmallSampleTag, Spinner, StrongReporterBadge } from "../components/ui";
+import { Avatar, Card, EmptyState, ErrorNote, Note, RagBadge, SectionHeading, SmallSampleTag, Spinner, StrongReporterBadge } from "../components/ui";
 import { useFilters, useMeta } from "../store";
 import type { StaffProfile as Profile, TimelineEvent } from "../types";
 
@@ -88,37 +88,47 @@ export default function StaffProfile() {
 
   return (
     <div className="space-y-5">
-      <nav aria-label="Breadcrumb" className="text-sm text-ink/60">
-        <Link to="/risk" className="text-petrol hover:underline">Staff risk board</Link> / {data.staff.StaffName}
+      <nav aria-label="Breadcrumb" className="text-[12.5px] text-muted">
+        <Link to="/risk" className="font-medium text-petrol hover:underline">Staff risk board</Link>
+        <span className="mx-1.5 text-[#b9c8c3]">/</span>{data.staff.StaffName}
       </nav>
 
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="font-display text-2xl font-semibold text-ink">{data.staff.StaffName}</h1>
-          <p className="text-sm text-ink/60">
-            {data.staff.Role} · {data.staff.Team} · started {dateLabel(data.staff.StartDate)} · {data.staff.ContractedHours}h contracted
-          </p>
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            <RagBadge band={m.band} />
-            {m.strongReporter && <StrongReporterBadge />}
-            {m.smallSample.visits && meta && <SmallSampleTag what="sessions" min={meta.smallSample.minVisits} />}
+        <div className="flex items-start gap-3.5">
+          <Avatar name={data.staff.StaffName} size="lg" />
+          <div>
+            <h1 className="font-display text-[22px] font-semibold text-ink">{data.staff.StaffName}</h1>
+            <p className="mt-0.5 text-[13px] text-muted">
+              {data.staff.Role} · {data.staff.Team} · started {dateLabel(data.staff.StartDate)} · {data.staff.ContractedHours}h contracted
+            </p>
+            <div className="mt-2.5 flex flex-wrap items-center gap-2">
+              <RagBadge band={m.band} />
+              {m.strongReporter && <StrongReporterBadge />}
+              {m.smallSample.visits && meta && <SmallSampleTag what="sessions" min={meta.smallSample.minVisits} />}
+            </div>
           </div>
         </div>
         <Link
           to={`/staff/${data.staff.StaffID}/pack?months=${months}`}
-          className="rounded-lg bg-petrol px-4 py-2.5 text-sm font-semibold text-white shadow-card hover:bg-petrol-700"
+          className="inline-flex items-center gap-2 rounded-lg bg-petrol px-[18px] py-[11px] text-[13.5px] font-semibold text-white shadow-btn hover:bg-petrol-700"
         >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2M6 14h12v7H6z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" /></svg>
           Generate supervision pack
         </Link>
       </div>
 
+      <Note tone="sage">
+        This profile supports a supervision conversation and quality improvement — it is <strong className="font-semibold">not</strong> an
+        automated performance judgement. Every figure is normalised per 100 completed sessions and shown alongside its raw
+        count and the sessions that provide its context.
+      </Note>
+
       {m.strongReporter && (
-        <div role="note" className="rounded-xl border border-petrol/25 bg-petrol-50 px-4 py-3 text-sm text-petrol-800">
-          <strong className="font-semibold">Strong reporter, not a risk.</strong> {data.staff.StaffName.split(" ")[0]} logs
-          more incidents than most colleagues, but almost all are low severity and their feedback average is{" "}
-          {m.feedback.avg}. This pattern usually reflects a conscientious reporting culture - recognise it in supervision
-          rather than treating the volume as a concern.
-        </div>
+        <Note title="Strong reporter, not a risk">
+          {data.staff.StaffName.split(" ")[0]} logs more incidents than most colleagues, but almost all are low severity
+          and their feedback average is {m.feedback.avg}/5. This pattern usually reflects a conscientious reporting
+          culture — recognise it in supervision rather than treating the volume as a concern.
+        </Note>
       )}
 
       {/* KPI strip: raw count and rate side by side, never a raw count alone */}

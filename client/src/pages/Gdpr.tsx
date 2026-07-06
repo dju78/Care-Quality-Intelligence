@@ -53,22 +53,16 @@ const SECTIONS = [
 
 export default function Gdpr() {
   return (
-    <div className="mx-auto max-w-3xl space-y-5">
-      <div>
-        <h1 className="font-display text-2xl font-semibold text-ink">Data protection at a glance</h1>
-        <p className="text-sm text-ink/60">
-          How Aldanat Quality Intelligence handles personal data - written for managers and inspectors, not lawyers.
-        </p>
-      </div>
+    <div className="mx-auto max-w-3xl space-y-4">
       {SECTIONS.map((s) => (
         <Card key={s.title} as="section" className="p-5">
           <h2 className="font-display text-base font-semibold text-ink">{s.title}</h2>
           {s.body.map((p, i) => (
-            <p key={i} className="mt-2 text-sm leading-relaxed text-ink/75">{p}</p>
+            <p key={i} className="mt-2 text-sm leading-relaxed text-moss">{p}</p>
           ))}
         </Card>
       ))}
-      <p className="text-xs text-ink/50">
+      <p className="text-xs text-faint">
         Review annually. Last reviewed July 2026. This page is guidance for a care provider audience and does not replace
         the organisation's full data protection policy.
       </p>

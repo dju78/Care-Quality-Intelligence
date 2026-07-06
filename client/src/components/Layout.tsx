@@ -1,29 +1,73 @@
 import { useEffect, useState } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { useAuth, useFilters, useMeta } from "../store";
 import type { Meta } from "../types";
+import { Avatar } from "./ui";
 
-const NAV = [
+const NAV_MAIN = [
   { to: "/", label: "Overview", roles: ["Director", "Registered Manager", "Team Leader"] },
   { to: "/risk", label: "Staff risk board", roles: ["Director", "Registered Manager", "Team Leader"] },
   { to: "/cqc", label: "CQC evidence", roles: ["Director", "Registered Manager", "Team Leader"] },
   { to: "/data", label: "Data manager", roles: ["Director", "Registered Manager"] },
   { to: "/admin", label: "Admin", roles: ["Director", "Registered Manager"] },
-  { to: "/gdpr", label: "Data protection", roles: ["Director", "Registered Manager", "Team Leader"] },
 ];
+const NAV_GOV = [{ to: "/gdpr", label: "Data protection", roles: ["Director", "Registered Manager", "Team Leader"] }];
+
+/** Page title/subtitle + whether the global filters apply, keyed by route. */
+function pageMeta(pathname: string, team: string): { title: string; sub: string; filters: boolean } {
+  const scope = team === "All" ? "all Aldanat services" : team;
+  if (pathname === "/") return { title: "Quality overview", sub: `Incidents, complaints and feedback across ${scope}`, filters: true };
+  if (pathname === "/risk") return { title: "Staff risk board", sub: "Quality Risk Index per carer, normalised per 100 completed support sessions", filters: true };
+  if (pathname.startsWith("/staff/")) return { title: "Staff profile", sub: "Supervision view · figures normalised per 100 completed sessions", filters: true };
+  if (pathname === "/cqc") return { title: "CQC evidence", sub: "Metrics mapped to the single assessment framework · inspection-ready evidence", filters: true };
+  if (pathname === "/data") return { title: "Data manager", sub: "Import and validate Excel or CSV extracts against the AQI schema", filters: false };
+  if (pathname === "/admin") return { title: "Admin", sub: "QRI configuration, user accounts and the audit trail", filters: false };
+  if (pathname === "/gdpr") return { title: "Data protection & governance", sub: "How AQI handles personal data — written for managers and inspectors", filters: false };
+  return { title: "Aldanat Quality Intelligence", sub: "", filters: false };
+}
 
 function Logo() {
   return (
-    <div className="flex items-center gap-2.5">
-      <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-petrol text-white font-display font-bold text-sm" aria-hidden="true">
+    <div className="flex items-center gap-3 px-1">
+      <span className="flex h-[38px] w-[38px] items-center justify-center rounded-[11px] bg-petrol font-display text-sm font-bold tracking-wide text-white" aria-hidden="true">
         AQ
       </span>
       <span className="leading-tight">
-        <span className="block font-display font-semibold text-ink">Aldanat Quality</span>
-        <span className="block text-[11px] uppercase tracking-widest text-petrol">Intelligence</span>
+        <span className="block font-display text-[15px] font-semibold text-ink">Aldanat Quality</span>
+        <span className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-petrol">Intelligence</span>
       </span>
     </div>
+  );
+}
+
+function NavGroup({ heading, items, onNavigate }: { heading: string; items: typeof NAV_MAIN; onNavigate?: () => void }) {
+  return (
+    <>
+      <p className="mb-2 mt-5 px-2 text-[10.5px] font-bold uppercase tracking-[0.12em] text-faint">{heading}</p>
+      <nav className="flex flex-col gap-0.5" aria-label={heading}>
+        {items.map((n) => (
+          <NavLink
+            key={n.to}
+            to={n.to}
+            end={n.to === "/"}
+            onClick={onNavigate}
+            className={({ isActive }) =>
+              `group flex items-center gap-3 rounded-lg px-3 py-2 text-[13.5px] transition-colors ${
+                isActive ? "bg-petrol font-semibold text-white" : "font-medium text-moss hover:bg-mist"
+              }`
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <span className={`h-[7px] w-[7px] shrink-0 rounded-sm ${isActive ? "bg-avatar" : "bg-[#b9c8c3]"}`} aria-hidden="true" />
+                <span>{n.label}</span>
+              </>
+            )}
+          </NavLink>
+        ))}
+      </nav>
+    </>
   );
 }
 
@@ -33,30 +77,33 @@ export function FilterBar() {
   const user = useAuth((s) => s.user);
   const isTeamLeader = user?.Role === "Team Leader";
   return (
-    <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Global filters">
+    <div className="flex flex-wrap items-center gap-2.5" role="group" aria-label="Global filters">
       <label className="sr-only" htmlFor="team-filter">Filter by service</label>
-      <select
-        id="team-filter"
-        value={isTeamLeader ? user?.Team ?? "" : team}
-        onChange={(e) => setTeam(e.target.value)}
-        disabled={isTeamLeader}
-        className="rounded-lg border border-ink/15 bg-white px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-70"
-        title={isTeamLeader ? "Team Leaders see their own service only" : undefined}
-      >
-        {!isTeamLeader && <option value="All">All services</option>}
-        {(isTeamLeader ? [user?.Team ?? ""] : meta?.teams ?? []).map((t) => (
-          <option key={t} value={t}>{t}</option>
-        ))}
-      </select>
-      <div className="inline-flex rounded-lg border border-ink/15 bg-white p-0.5" role="radiogroup" aria-label="Reporting period">
+      <div className="relative">
+        <select
+          id="team-filter"
+          value={isTeamLeader ? user?.Team ?? "" : team}
+          onChange={(e) => setTeam(e.target.value)}
+          disabled={isTeamLeader}
+          className="appearance-none rounded-lg border border-line bg-white py-2 pl-3 pr-8 text-[13px] font-medium text-ink disabled:opacity-70"
+          title={isTeamLeader ? "Team Leaders see their own service only" : undefined}
+        >
+          {!isTeamLeader && <option value="All">All services</option>}
+          {(isTeamLeader ? [user?.Team ?? ""] : meta?.teams ?? []).map((t) => (
+            <option key={t} value={t}>{t}</option>
+          ))}
+        </select>
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted">▼</span>
+      </div>
+      <div className="inline-flex rounded-lg border border-line bg-white p-0.5" role="radiogroup" aria-label="Reporting period">
         {[3, 6, 12].map((m) => (
           <button
             key={m}
             role="radio"
             aria-checked={months === m}
             onClick={() => setMonths(m as 3 | 6 | 12)}
-            className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
-              months === m ? "bg-petrol text-white" : "text-ink/70 hover:bg-mist"
+            className={`rounded-md px-3.5 py-1 text-[13px] font-medium transition-colors ${
+              months === m ? "bg-petrol text-white" : "text-muted hover:bg-mist"
             }`}
           >
             {m}m
@@ -69,8 +116,10 @@ export function FilterBar() {
 
 export default function Layout() {
   const { user, token, clearAuth } = useAuth();
+  const { team } = useFilters();
   const setMeta = useMeta((s) => s.setMeta);
   const navigate = useNavigate();
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -83,91 +132,88 @@ export default function Layout() {
     navigate("/login");
   };
 
-  const links = NAV.filter((n) => user && n.roles.includes(user.Role));
+  const mainLinks = NAV_MAIN.filter((n) => user && n.roles.includes(user.Role));
+  const govLinks = NAV_GOV.filter((n) => user && n.roles.includes(user.Role));
+  const { title, sub, filters } = pageMeta(location.pathname, team);
 
   return (
-    <div className="min-h-screen bg-mist lg:flex">
-      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:rounded-lg focus:m-2">
+    <div className="aqi-scroll min-h-screen bg-mist lg:flex">
+      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2">
         Skip to main content
       </a>
-      {/* sidebar (desktop) / topbar (mobile) */}
-      <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between border-b border-ink/10 bg-white px-4 py-3">
+
+      {/* mobile top bar */}
+      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-line bg-white px-4 py-3 lg:hidden">
         <Logo />
         <button
           aria-expanded={menuOpen}
           aria-controls="mobile-nav"
           onClick={() => setMenuOpen((o) => !o)}
-          className="rounded-lg border border-ink/15 p-2"
+          className="rounded-lg border border-line p-2 text-ink"
         >
           <span className="sr-only">{menuOpen ? "Close menu" : "Open menu"}</span>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            {menuOpen ? (
-              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            ) : (
-              <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            )}
+            {menuOpen ? <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /> : <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />}
           </svg>
         </button>
       </header>
       {menuOpen && (
-        <nav id="mobile-nav" className="lg:hidden border-b border-ink/10 bg-white px-4 py-2" aria-label="Main navigation">
-          {links.map((n) => (
+        <nav id="mobile-nav" className="border-b border-line bg-white px-3 py-2 lg:hidden" aria-label="Main navigation">
+          {[...mainLinks, ...govLinks].map((n) => (
             <NavLink
               key={n.to}
               to={n.to}
               end={n.to === "/"}
               onClick={() => setMenuOpen(false)}
-              className={({ isActive }) =>
-                `block rounded-lg px-3 py-2 text-sm font-medium ${isActive ? "bg-petrol-50 text-petrol-700" : "text-ink/75"}`
-              }
+              className={({ isActive }) => `block rounded-lg px-3 py-2.5 text-sm font-medium ${isActive ? "bg-petroltint text-petrol-700" : "text-moss"}`}
             >
               {n.label}
             </NavLink>
           ))}
-          <button onClick={signOut} className="mt-1 block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-rust-700">
+          <button onClick={signOut} className="mt-1 block w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium text-rust-700">
             Sign out {user?.DisplayName}
           </button>
         </nav>
       )}
 
-      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:justify-between border-r border-ink/10 bg-white px-4 py-6 lg:sticky lg:top-0 lg:h-screen">
+      {/* desktop sidebar */}
+      <aside className="hidden border-r border-line bg-white px-4 py-6 lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-[264px] lg:flex-col lg:justify-between">
         <div>
           <Logo />
-          <nav className="mt-8 flex flex-col gap-1" aria-label="Main navigation">
-            {links.map((n) => (
-              <NavLink
-                key={n.to}
-                to={n.to}
-                end={n.to === "/"}
-                className={({ isActive }) =>
-                  `rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                    isActive ? "bg-petrol text-white" : "text-ink/75 hover:bg-mist"
-                  }`
-                }
-              >
-                {n.label}
-              </NavLink>
-            ))}
-          </nav>
+          <NavGroup heading="Quality monitoring" items={mainLinks} />
+          {govLinks.length > 0 && <NavGroup heading="Governance" items={govLinks} />}
         </div>
-        <div className="border-t border-ink/10 pt-4">
-          <p className="text-sm font-semibold text-ink">{user?.DisplayName}</p>
-          <p className="text-xs text-ink/60">
-            {user?.Role}
-            {user?.Team ? ` · ${user.Team}` : ""}
-          </p>
-          <button onClick={signOut} className="mt-2 rounded-lg border border-ink/15 px-3 py-1.5 text-sm font-medium text-ink/75 hover:bg-mist">
+        <div className="border-t border-line pt-3.5">
+          <div className="flex items-center gap-2.5">
+            <Avatar name={user?.DisplayName ?? "?"} size="sm" />
+            <span className="min-w-0 leading-tight">
+              <span className="block truncate text-[13px] font-semibold text-ink">{user?.DisplayName}</span>
+              <span className="block truncate text-[11px] text-muted">{user?.Role}{user?.Team ? ` · ${user.Team}` : " · All services"}</span>
+            </span>
+          </div>
+          <button onClick={signOut} className="mt-3 w-full rounded-lg border border-line bg-white py-2 text-[12.5px] font-medium text-muted hover:bg-mist">
             Sign out
           </button>
         </div>
       </aside>
 
-      <div className="flex-1 min-w-0">
-        <main id="main" className="mx-auto max-w-7xl px-4 py-6 lg:px-8">
+      <div className="flex min-w-0 flex-1 flex-col">
+        {/* sticky translucent page header carrying title + filters */}
+        <div className="sticky top-0 z-30 border-b border-line bg-mist/90 backdrop-blur">
+          <div className="mx-auto flex max-w-[1240px] flex-wrap items-end justify-between gap-4 px-4 py-[18px] lg:px-8">
+            <div className="min-w-0">
+              <h1 className="font-display text-[23px] font-semibold tracking-[-0.3px] text-ink">{title}</h1>
+              {sub && <p className="mt-1 max-w-2xl text-[13.5px] text-muted">{sub}</p>}
+            </div>
+            {filters && <FilterBar />}
+          </div>
+        </div>
+
+        <main id="main" className="mx-auto w-full max-w-[1240px] flex-1 px-4 py-7 lg:px-8">
           <Outlet />
         </main>
-        <footer className="mx-auto max-w-7xl px-4 pb-6 lg:px-8 text-xs text-ink/45">
-          Aldanat Quality Intelligence · People are shown by ClientRef only · Quality data supports supervision conversations, it is not an automated judgement.
+        <footer className="mx-auto max-w-[1240px] px-4 pb-7 text-[11.5px] text-faint lg:px-8">
+          Aldanat Quality Intelligence · People we support are shown by ClientRef only · Quality data supports supervision conversations, it is not an automated judgement.
         </footer>
       </div>
     </div>

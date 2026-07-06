@@ -3,10 +3,32 @@ import {
   ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 import { monthLabel, prefersReducedMotion, useApi } from "../api";
-import { FilterBar } from "../components/Layout";
 import { Card, EmptyState, ErrorNote, KpiCard, SectionHeading, Spinner } from "../components/ui";
 import { useFilters } from "../store";
 import type { OverviewData } from "../types";
+
+/** Derive a short "what needs attention" list from the period KPIs. */
+function attentionItems(d: OverviewData) {
+  const items: { level: "Priority" | "Review" | "Watch" | "Assured"; text: string }[] = [];
+  if (d.kpis.highSeverity > 0)
+    items.push({ level: "Priority", text: `${d.kpis.highSeverity} high severity incident${d.kpis.highSeverity > 1 ? "s" : ""} and ${d.kpis.notifiable} CQC-notifiable events in the period — confirm each has a management review and notification date.` });
+  if (d.kpis.upheldPct !== null && d.kpis.upheldPct >= 25)
+    items.push({ level: "Review", text: `Complaint upheld rate of ${d.kpis.upheldPct}% sits above the 25% internal threshold — review complaint handling at the next governance meeting.` });
+  if (d.kpis.reported24hPct !== null && d.kpis.reported24hPct < d.targets.reportedWithin24hPct)
+    items.push({ level: "Review", text: `24-hour incident reporting is ${d.kpis.reported24hPct}% against a ${d.targets.reportedWithin24hPct}% target — reinforce timely reporting in supervision.` });
+  if (d.kpis.missedPct !== null && d.kpis.missedPct >= 1.5)
+    items.push({ level: "Watch", text: `Missed-session rate (${d.kpis.missedPct}%) is above the 1.5% target — check rota cover for the affected service.` });
+  if (items.length === 0)
+    items.push({ level: "Assured", text: "No priority quality concerns in this period. Use the risk board to plan routine supervision." });
+  return items.slice(0, 4);
+}
+
+const LEVEL_TAG: Record<string, string> = {
+  Priority: "bg-rust-100 text-rust-700",
+  Review: "bg-amber-100 text-amber-700",
+  Watch: "bg-[#E7EEEC] text-[#4a6560]",
+  Assured: "bg-sage-100 text-sage-600",
+};
 
 const C = { petrol: "#0F5257", sage: "#5F9678", amber: "#D9A441", rust: "#BF4A36", ink: "#12333A" };
 const animate = !prefersReducedMotion();
@@ -22,57 +44,77 @@ export default function Overview() {
   const { team, months } = useFilters();
   const { data, loading, error } = useApi<OverviewData>(`/api/overview?months=${months}&team=${encodeURIComponent(team)}`);
 
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl font-semibold text-ink">Quality overview</h1>
-          <p className="text-sm text-ink/60">
-            Incidents, complaints and feedback across {team === "All" ? "all Aldanat services" : team}, last {months} months
-          </p>
-        </div>
-        <FilterBar />
-      </div>
+  const belowFeedback = data && data.kpis.avgFeedback !== null && data.kpis.avgFeedback < data.targets.avgFeedback;
+  const below24h = data && data.kpis.reported24hPct !== null && data.kpis.reported24hPct < data.targets.reportedWithin24hPct;
 
+  return (
+    <div className="space-y-5">
       {error && <ErrorNote message={error} />}
       {loading && <Spinner label="Loading overview" />}
 
       {data && (
         <>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-7">
-            <KpiCard label="Incidents" value={data.kpis.incidents} sub={`${data.kpis.notifiable} CQC notifiable`} />
-            <KpiCard label="High severity" value={data.kpis.highSeverity} warn={data.kpis.highSeverity > 0} sub="incidents in period" />
+            <KpiCard label="Incidents" value={data.kpis.incidents} sub={`${data.kpis.notifiable} CQC notifiable`} tone="petrol" />
+            <KpiCard label="High severity" value={data.kpis.highSeverity} sub="incidents in period" tone={data.kpis.highSeverity > 0 ? "amber" : "sage"} />
             <KpiCard
               label="Reported in 24h"
               value={data.kpis.reported24hPct !== null ? `${data.kpis.reported24hPct}%` : "—"}
-              good={data.kpis.reported24hPct !== null ? data.kpis.reported24hPct >= data.targets.reportedWithin24hPct : undefined}
-              target={`Target ${data.targets.reportedWithin24hPct}%`}
+              tone={below24h ? "amber" : "sage"}
+              target={`Target ${data.targets.reportedWithin24hPct}%${below24h ? "" : " · met"}`}
             />
-            <KpiCard label="Complaints" value={data.kpis.complaints} sub="received in period" />
+            <KpiCard label="Complaints" value={data.kpis.complaints} sub="received in period" tone="petrol" />
             <KpiCard
               label="Upheld rate"
               value={data.kpis.upheldPct !== null ? `${data.kpis.upheldPct}%` : "—"}
-              good={data.kpis.upheldPct !== null ? data.kpis.upheldPct < 25 : undefined}
               sub="of decided complaints"
+              tone={data.kpis.upheldPct !== null && data.kpis.upheldPct >= 25 ? "amber" : "sage"}
             />
             <KpiCard
               label="Avg feedback"
               value={data.kpis.avgFeedback ?? "—"}
-              good={data.kpis.avgFeedback !== null ? data.kpis.avgFeedback >= data.targets.avgFeedback : undefined}
+              tone={belowFeedback ? "amber" : "sage"}
               target={`Target ${data.targets.avgFeedback.toFixed(1)} · ${data.kpis.feedbackCount} responses`}
             />
             <KpiCard
               label="Missed sessions"
               value={data.kpis.missedPct !== null ? `${data.kpis.missedPct}%` : "—"}
-              good={data.kpis.missedPct !== null ? data.kpis.missedPct < 1.5 : undefined}
+              tone={data.kpis.missedPct !== null && data.kpis.missedPct >= 1.5 ? "amber" : "sage"}
               sub={`${data.kpis.latePct ?? 0}% late · ${data.kpis.completedVisits.toLocaleString()} delivered`}
             />
           </div>
 
-          <div className="grid gap-4 xl:grid-cols-2">
+          {/* attention summary + trend, 1.4fr / 2fr on wide screens */}
+          <div className="grid gap-4 [grid-template-columns:1fr] xl:[grid-template-columns:1.4fr_2fr]">
+            <Card className="flex flex-col p-4">
+              <div className="flex items-center gap-2.5">
+                <span className="flex h-[26px] w-[26px] items-center justify-center rounded-lg bg-petrol text-sm font-bold text-white">!</span>
+                <h2 className="font-display text-base font-semibold text-ink">What needs attention?</h2>
+              </div>
+              <p className="mt-1.5 text-xs text-muted">
+                Summary for {team === "All" ? "all services" : team}, last {months} months. Priorities for the next supervision cycle.
+              </p>
+              <ul className="mt-3 flex flex-col gap-2.5">
+                {attentionItems(data).map((a, i) => (
+                  <li key={i} className="flex items-start gap-2.5">
+                    <span className={`mt-px inline-flex shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-bold uppercase tracking-wide ${LEVEL_TAG[a.level]}`}>{a.level}</span>
+                    <span className="text-[13px] leading-snug text-moss">{a.text}</span>
+                  </li>
+                ))}
+              </ul>
+              {!belowFeedback && !below24h && (
+                <div className="-mx-4 -mb-4 mt-3.5 flex items-start gap-2.5 rounded-b-xl border-t border-sage/20 bg-sagetint px-4 py-3">
+                  <span className="mt-px inline-flex shrink-0 rounded-full bg-avatar px-2 py-0.5 text-[10.5px] font-bold uppercase tracking-wide text-sage-600">Evidence ready</span>
+                  <span className="text-[13px] leading-snug text-sage-600">
+                    24-hour reporting and feedback are both above target — strong evidence for the CQC <strong className="font-semibold">Safe</strong> and <strong className="font-semibold">Well-led</strong> statements.
+                  </span>
+                </div>
+              )}
+            </Card>
+
             <Card className="p-4">
               <SectionHeading title="Incidents and complaints by month" sub="High severity incidents shown within the bars" />
-              <div className="h-72" role="img" aria-label="Monthly trend of incidents and complaints">
+              <div className="h-[250px]" role="img" aria-label="Monthly trend of incidents and complaints">
                 <ResponsiveContainer>
                   <ComposedChart data={data.monthly} margin={{ top: 4, right: 8, left: -18, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(18,51,58,0.08)" />
@@ -87,9 +129,11 @@ export default function Overview() {
                 </ResponsiveContainer>
               </div>
             </Card>
+          </div>
 
+          <div className="grid gap-4 xl:grid-cols-2">
             <Card className="p-4">
-              <SectionHeading title="Average feedback score by month" sub={`Dashed line marks the ${data.targets.avgFeedback.toFixed(1)} target`} />
+              <SectionHeading title="Average feedback score by month" sub={`Dashed line marks the ${data.targets.avgFeedback.toFixed(1)} target · people we support`} />
               <div className="h-72" role="img" aria-label="Monthly average feedback score against target">
                 <ResponsiveContainer>
                   <LineChart data={data.monthly} margin={{ top: 4, right: 8, left: -18, bottom: 0 }}>

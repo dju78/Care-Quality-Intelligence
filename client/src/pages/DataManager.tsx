@@ -89,14 +89,6 @@ export default function DataManager() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="font-display text-2xl font-semibold text-ink">Data manager</h1>
-        <p className="text-sm text-ink/60">
-          Import Excel or CSV extracts matching the AQI schema. Every row is validated before anything is committed,
-          and the last import can be rolled back.
-        </p>
-      </div>
-
       {message && (
         <div
           role="status"

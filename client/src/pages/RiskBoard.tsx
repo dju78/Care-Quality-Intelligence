@@ -1,18 +1,26 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useApi } from "../api";
-import { FilterBar } from "../components/Layout";
-import { EmptyState, ErrorNote, RagBadge, SmallSampleTag, Spinner, StrongReporterBadge } from "../components/ui";
+import { EmptyState, ErrorNote, Note, RagBadge, SmallSampleTag, Spinner, StrongReporterBadge } from "../components/ui";
 import { useFilters, useMeta } from "../store";
 import type { Period, StaffMetrics } from "../types";
 
 const BAND_ORDER = { Red: 0, Amber: 1, Green: 2 } as const;
-const BAND_BORDER: Record<string, string> = {
-  Red: "border-l-rust",
-  Amber: "border-l-amber",
-  Green: "border-l-sage",
-  none: "border-l-ink/20",
-};
+const BAND_EDGE: Record<string, string> = { Red: "#BF4A36", Amber: "#D9A441", Green: "#5F9678", none: "#c2cec9" };
+// Filter chips use the softened, supervision-first language.
+const CHIPS = [
+  { key: "All", label: "All" },
+  { key: "Red", label: "Priority attention" },
+  { key: "Amber", label: "Review" },
+  { key: "Green", label: "Within range" },
+  { key: "Not rated", label: "Not rated" },
+];
+const LEGEND = [
+  { edge: "#BF4A36", label: "Priority attention", note: "QRI ≥ 25" },
+  { edge: "#D9A441", label: "Review in supervision", note: "QRI 12–25" },
+  { edge: "#5F9678", label: "Within expected range", note: "QRI < 12" },
+  { edge: "#c2cec9", label: "Not rated", note: "sample too small" },
+];
 
 export default function RiskBoard() {
   const { team, months } = useFilters();
@@ -38,105 +46,92 @@ export default function RiskBoard() {
       });
   }, [data, bandFilter]);
 
+  const countFor = (key: string) =>
+    data ? data.staff.filter((s) => (key === "Not rated" ? s.band === null : s.band === key)).length : 0;
+
   return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl font-semibold text-ink">Staff risk board</h1>
-          <p className="text-sm text-ink/60">
-            Quality Risk Index per carer, normalised per 100 completed support sessions · last {months} months
-          </p>
-        </div>
-        <FilterBar />
-      </div>
-
+    <div className="space-y-4">
       {/* Interpretation note - a governance requirement, always visible */}
-      <div role="note" className="rounded-xl border border-petrol/25 bg-petrol-50 px-4 py-3 text-sm text-petrol-800">
-        <strong className="font-semibold">How to read this board.</strong> The QRI prioritises who to have a supervision
-        conversation with first - it is <em>not</em> an automated performance judgement. Rates are normalised per 100
-        completed sessions so busier staff are not penalised, frequent low-severity reporters with strong feedback are
-        flagged as <StrongReporterBadge className="mx-0.5 align-middle" /> rather than as risks, and RAG colouring is
-        withheld where the sample is too small to be fair
-        {meta ? ` (fewer than ${meta.smallSample.minVisits} sessions or ${meta.smallSample.minFeedback} feedback responses)` : ""}.
-      </div>
+      <Note title="How to read this board">
+        The Quality Risk Index prioritises who to have a supervision conversation with first — it is <em>not</em> an
+        automated performance judgement. Rates are normalised per 100 completed sessions so busier staff are not
+        penalised, conscientious frequent reporters with strong feedback are flagged as a{" "}
+        <StrongReporterBadge className="mx-0.5 align-middle" /> rather than a risk, and RAG colouring is withheld where
+        the sample is too small to be fair
+        {meta ? ` (fewer than ${meta.smallSample.minVisits} completed sessions or ${meta.smallSample.minFeedback} feedback responses)` : ""}.
+      </Note>
 
-      <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Filter by RAG band">
-        {["All", "Red", "Amber", "Green", "Not rated"].map((b) => (
+      <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Filter by band">
+        {CHIPS.map((c) => (
           <button
-            key={b}
-            onClick={() => setBandFilter(b)}
-            aria-pressed={bandFilter === b}
-            className={`rounded-full px-3 py-1 text-sm font-medium border ${
-              bandFilter === b ? "border-petrol bg-petrol text-white" : "border-ink/15 bg-white text-ink/70 hover:bg-mist"
+            key={c.key}
+            onClick={() => setBandFilter(c.key)}
+            aria-pressed={bandFilter === c.key}
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12.5px] font-medium ${
+              bandFilter === c.key ? "border-petrol bg-petrol text-white" : "border-line bg-white text-moss hover:bg-mist"
             }`}
           >
-            {b}
-            {data && b !== "All" && (
-              <span className="ml-1 tabular opacity-75">
-                {data.staff.filter((s) => (b === "Not rated" ? s.band === null : s.band === b)).length}
-              </span>
-            )}
+            <span>{c.label}</span>
+            {c.key !== "All" && <span className={`tabular text-[11.5px] font-semibold ${bandFilter === c.key ? "opacity-85" : "opacity-55"}`}>{countFor(c.key)}</span>}
           </button>
         ))}
-        {meta && (
-          <span className="ml-auto text-xs text-ink/55">
-            Red ≥ {meta.ragBands.red} · Amber {meta.ragBands.amber}–{meta.ragBands.red} · Green &lt; {meta.ragBands.amber}
+      </div>
+
+      {/* legend */}
+      <div className="flex flex-wrap gap-x-5 gap-y-2 rounded-xl border border-line bg-white px-4 py-3">
+        {LEGEND.map((l) => (
+          <span key={l.label} className="flex items-center gap-2 text-[11.5px] text-muted">
+            <span className="h-[11px] w-[11px] rounded-sm" style={{ background: l.edge }} aria-hidden="true" />
+            <strong className="font-semibold text-moss">{l.label}</strong> {l.note}
           </span>
-        )}
+        ))}
       </div>
 
       {error && <ErrorNote message={error} />}
       {loading && <Spinner label="Ranking staff" />}
 
       {data && sorted.length === 0 && (
-        <EmptyState
-          title="No staff match this view"
-          hint="Try another RAG band or widen the service and period filters above."
-        />
+        <EmptyState title="No staff match this view" hint="Try another band or widen the service and period filters above." />
       )}
 
-      <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <ul className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(300px,1fr))]">
         {sorted.map((s) => (
           <li key={s.StaffID}>
             <Link
               to={`/staff/${s.StaffID}`}
-              className={`block h-full rounded-xl border border-ink/10 border-l-4 bg-white p-4 shadow-card transition-shadow hover:shadow-lg focus-visible:shadow-lg ${BAND_BORDER[s.band ?? "none"]}`}
+              className="block h-full rounded-xl border border-line bg-white p-4 shadow-card transition-shadow hover:shadow-cardhover focus-visible:shadow-cardhover"
+              style={{ borderLeft: `4px solid ${BAND_EDGE[s.band ?? "none"]}` }}
             >
-              <div className="flex items-start justify-between gap-2">
+              <div className="flex items-start justify-between gap-2.5">
                 <div className="min-w-0">
-                  <p className="truncate font-display font-semibold text-ink">{s.StaffName}</p>
-                  <p className="text-xs text-ink/60">{s.Role} · {s.Team}</p>
+                  <p className="truncate font-display text-[14.5px] font-semibold text-ink">{s.StaffName}</p>
+                  <p className="mt-0.5 text-[11.5px] text-muted">{s.Role} · {s.Team}</p>
                 </div>
-                <div className="text-right shrink-0">
-                  <p className="font-display text-2xl font-bold tabular text-ink">{s.qri ?? "—"}</p>
-                  <p className="text-[10px] uppercase tracking-wide text-ink/50">QRI</p>
+                <div className="shrink-0 text-right">
+                  <p className="font-display text-[26px] font-bold leading-none tabular" style={{ color: s.band === null ? "#9fb0ab" : "#12333A" }}>{s.qri ?? "—"}</p>
+                  <p className="mt-0.5 text-[9.5px] font-semibold uppercase tracking-wider text-faint">QRI</p>
                 </div>
               </div>
-              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
                 <RagBadge band={s.band} />
                 {s.strongReporter && <StrongReporterBadge />}
                 {s.smallSample.visits && meta && <SmallSampleTag what="sessions" min={meta.smallSample.minVisits} />}
               </div>
-              <dl className="mt-3 grid grid-cols-3 gap-2 text-xs">
+              <dl className="mt-3.5 grid grid-cols-3 gap-2">
                 <div>
-                  <dt className="text-ink/55">Incidents</dt>
-                  <dd className="font-semibold tabular text-ink">
-                    {s.incidents.count}
-                    <span className="font-normal text-ink/55"> · {s.incidents.per100 ?? "—"}/100</span>
+                  <dt className="mb-0.5 text-[10.5px] text-faint">Incidents</dt>
+                  <dd className="text-[13px] font-semibold tabular text-ink">
+                    {s.incidents.count}<span className="text-[11px] font-normal text-faint"> · {s.incidents.per100 ?? "—"}/100</span>
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-ink/55">Upheld compl.</dt>
-                  <dd className="font-semibold tabular text-ink">{s.complaints.upheld}<span className="font-normal text-ink/55"> of {s.complaints.count}</span></dd>
+                  <dt className="mb-0.5 text-[10.5px] text-faint">Upheld compl.</dt>
+                  <dd className="text-[13px] font-semibold tabular text-ink">{s.complaints.upheld}<span className="text-[11px] font-normal text-faint"> of {s.complaints.count}</span></dd>
                 </div>
                 <div>
-                  <dt className="flex items-center gap-1 text-ink/55">Feedback</dt>
-                  <dd className="font-semibold tabular text-ink">
-                    {s.feedback.avg ?? "—"}
-                    <span className="font-normal text-ink/55"> ({s.feedback.count})</span>
-                    {s.smallSample.feedback && !s.smallSample.visits && meta && (
-                      <span className="ml-1 align-middle"><SmallSampleTag what="feedback responses" min={meta.smallSample.minFeedback} /></span>
-                    )}
+                  <dt className="mb-0.5 text-[10.5px] text-faint">Feedback</dt>
+                  <dd className="text-[13px] font-semibold tabular text-ink">
+                    {s.feedback.avg ?? "—"}<span className="text-[11px] font-normal text-faint"> ({s.feedback.count})</span>
                   </dd>
                 </div>
               </dl>

@@ -96,10 +96,6 @@ export default function Admin() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="font-display text-2xl font-semibold text-ink">Admin</h1>
-        <p className="text-sm text-ink/60">QRI configuration, user accounts and the audit trail. Every change here is itself audited.</p>
-      </div>
       <div className="flex gap-2" role="tablist" aria-label="Admin sections">
         {(["config", "users", "audit"] as const).map((t) => (
           <button

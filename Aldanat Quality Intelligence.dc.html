@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#F3F6F5;color:#12333A;font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3,h4{font-family:Sora,Inter,sans-serif;margin:0;}
+  ::selection{background:#D2E5E5;}
+  :focus-visible{outline:3px solid #0F5257;outline-offset:2px;border-radius:5px;}
+  .aqi-scroll::-webkit-scrollbar{width:10px;height:10px;}
+  .aqi-scroll::-webkit-scrollbar-thumb{background:#cdd9d5;border-radius:8px;border:2px solid #F3F6F5;}
+  .aqi-mobilebar{display:none;}
+  [data-cols="attn"]{grid-template-columns:1.4fr 2fr !important;}
+  @media(max-width:1080px){[data-cols="attn"]{grid-template-columns:1fr !important;}}
+  @media(max-width:820px){
+    .aqi-sidebar{display:none !important;}
+    .aqi-mobilebar{display:flex !important;}
+    .aqi-shell{flex-direction:column !important;}
+    .aqi-main{padding:18px 16px 40px !important;}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important;}}
+  @media print{
+    @page{size:A4;margin:14mm 13mm;}
+    html,body{background:#fff !important;}
+    .aqi-sidebar,.aqi-mobilebar,[data-chrome]{display:none !important;}
+    .aqi-shell{display:block !important;}
+    .aqi-main{padding:0 !important;max-width:none !important;}
+    .aqi-sheet{box-shadow:none !important;border:none !important;border-radius:0 !important;margin:0 !important;max-width:none !important;padding:0 !important;}
+    .print-break{break-before:page;}
+    .avoid-break{break-inside:avoid;}
+  }
+</style>
+</helmet>
+
+<div class="aqi-shell aqi-scroll" style="display:flex;min-height:100vh;background:#F3F6F5;">
+
+  <!-- ============ SIDEBAR (desktop) ============ -->
+  <aside class="aqi-sidebar" style="width:264px;flex-shrink:0;background:#FFFFFF;border-right:1px solid #DDE6E3;display:flex;flex-direction:column;justify-content:space-between;position:sticky;top:0;height:100vh;padding:22px 16px;">
+    <div>
+      <div style="display:flex;align-items:center;gap:11px;padding:0 4px 4px;">
+        <span style="display:flex;height:38px;width:38px;align-items:center;justify-content:center;border-radius:11px;background:#0F5257;color:#fff;font-family:Sora;font-weight:700;font-size:14px;letter-spacing:.5px;">AQ</span>
+        <span style="line-height:1.1;">
+          <span style="display:block;font-family:Sora;font-weight:600;font-size:15px;color:#12333A;">Aldanat Quality</span>
+          <span style="display:block;font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:#0F5257;margin-top:2px;">Intelligence</span>
+        </span>
+      </div>
+
+      <p style="margin:22px 8px 8px;font-size:10.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#8aa09b;">Quality monitoring</p>
+      <nav style="display:flex;flex-direction:column;gap:3px;" aria-label="Main navigation">
+        <sc-for list="{{ nav }}" as="item" hint-placeholder-count="5">
+          <button onClick="{{ item.go }}" style="{{ item.style }}">
+            <span style="{{ item.dot }}"></span>
+            <span>{{ item.label }}</span>
+          </button>
+        </sc-for>
+      </nav>
+
+      <p style="margin:22px 8px 8px;font-size:10.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#8aa09b;">Governance</p>
+      <nav style="display:flex;flex-direction:column;gap:3px;" aria-label="Governance navigation">
+        <sc-for list="{{ navGov }}" as="item" hint-placeholder-count="2">
+          <button onClick="{{ item.go }}" style="{{ item.style }}">
+            <span style="{{ item.dot }}"></span>
+            <span>{{ item.label }}</span>
+          </button>
+        </sc-for>
+      </nav>
+    </div>
+
+    <div style="border-top:1px solid #DDE6E3;padding-top:14px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="display:flex;height:34px;width:34px;align-items:center;justify-content:center;border-radius:50%;background:#DCEAE2;color:#0F5257;font-family:Sora;font-weight:600;font-size:12px;">MO</span>
+        <span style="line-height:1.2;min-width:0;">
+          <span style="display:block;font-weight:600;font-size:13px;color:#12333A;">Margaret Osei</span>
+          <span style="display:block;font-size:11px;color:#5B7370;">Director · All services</span>
+        </span>
+      </div>
+      <button style="margin-top:12px;width:100%;border:1px solid #DDE6E3;background:#fff;border-radius:9px;padding:8px;font-size:12.5px;font-weight:500;color:#5B7370;cursor:pointer;">Sign out</button>
+    </div>
+  </aside>
+
+  <!-- ============ MOBILE TOP BAR ============ -->
+  <header class="aqi-mobilebar" style="position:sticky;top:0;z-index:40;align-items:center;justify-content:space-between;background:#fff;border-bottom:1px solid #DDE6E3;padding:12px 16px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="display:flex;height:34px;width:34px;align-items:center;justify-content:center;border-radius:10px;background:#0F5257;color:#fff;font-family:Sora;font-weight:700;font-size:13px;">AQ</span>
+      <span style="font-family:Sora;font-weight:600;font-size:14px;">Aldanat Quality Intelligence</span>
+    </div>
+    <button onClick="{{ toggleNav }}" aria-label="Menu" style="border:1px solid #DDE6E3;background:#fff;border-radius:9px;padding:7px 10px;cursor:pointer;color:#12333A;font-size:16px;line-height:1;">≡</button>
+  </header>
+  <sc-if value="{{ navOpen }}" hint-placeholder-val="{{ false }}">
+    <nav class="aqi-mobilebar" style="flex-direction:column;background:#fff;border-bottom:1px solid #DDE6E3;padding:8px 12px;gap:2px;">
+      <sc-for list="{{ navAll }}" as="item" hint-placeholder-count="6">
+        <button onClick="{{ item.go }}" style="{{ item.styleMobile }}">{{ item.label }}</button>
+      </sc-for>
+    </nav>
+  </sc-if>
+
+  <!-- ============ MAIN ============ -->
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column;">
+
+    <!-- header / filters -->
+    <div data-chrome style="position:sticky;top:0;z-index:30;background:rgba(243,246,245,0.9);backdrop-filter:blur(8px);border-bottom:1px solid #DDE6E3;">
+      <div style="max-width:1240px;margin:0 auto;padding:18px 32px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;">
+        <div style="min-width:0;">
+          <h1 style="font-size:23px;font-weight:600;color:#12333A;letter-spacing:-0.3px;">{{ pageTitle }}</h1>
+          <p style="margin:4px 0 0;font-size:13.5px;color:#5B7370;max-width:640px;">{{ pageSub }}</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div style="position:relative;">
+            <select aria-label="Filter by service" style="appearance:none;background:#fff;border:1px solid #DDE6E3;border-radius:9px;padding:8px 30px 8px 12px;font-family:Inter;font-size:13px;font-weight:500;color:#12333A;cursor:pointer;">
+              <option>All services</option>
+              <option>The Retreat</option>
+              <option>Peter House</option>
+              <option>Senna House</option>
+              <option>Community Outreach</option>
+            </select>
+            <span style="position:absolute;right:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:#5B7370;font-size:10px;">▼</span>
+          </div>
+          <div style="display:inline-flex;background:#fff;border:1px solid #DDE6E3;border-radius:9px;padding:3px;" role="radiogroup" aria-label="Reporting period">
+            <sc-for list="{{ periods }}" as="p" hint-placeholder-count="3">
+              <button onClick="{{ p.go }}" style="{{ p.style }}">{{ p.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <main class="aqi-main" style="flex:1;max-width:1240px;width:100%;margin:0 auto;padding:26px 32px 56px;">
+
+      <!-- ======================= OVERVIEW ======================= -->
+      <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:20px;">
+
+        <!-- KPI row -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:12px;">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="7">
+            <div style="{{ k.card }}">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+                <span style="font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:#7a908c;">{{ k.label }}</span>
+                <span style="{{ k.pipStyle }}"></span>
+              </div>
+              <span style="font-family:Sora;font-size:28px;font-weight:600;color:#12333A;font-variant-numeric:tabular-nums;line-height:1.1;margin-top:8px;">{{ k.value }}</span>
+              <span style="font-size:11.5px;color:#5B7370;margin-top:5px;line-height:1.35;">{{ k.sub }}</span>
+              <span style="font-size:11px;color:#8aa09b;margin-top:1px;">{{ k.target }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- attention + trend row -->
+        <div style="display:grid;grid-template-columns:1fr;gap:16px;" data-cols="attn">
+          <div style="{{ attnCard }}">
+            <div style="display:flex;align-items:center;gap:9px;">
+              <span style="display:flex;height:26px;width:26px;align-items:center;justify-content:center;border-radius:8px;background:#0F5257;color:#fff;font-size:14px;font-weight:700;">!</span>
+              <h2 style="font-size:16px;font-weight:600;color:#12333A;">What needs attention?</h2>
+            </div>
+            <p style="font-size:12px;color:#5B7370;margin:6px 0 4px;">Director summary for the last 12 months, All services. Priorities for the next supervision cycle.</p>
+            <ul style="list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:9px;">
+              <sc-for list="{{ attention }}" as="a" hint-placeholder-count="4">
+                <li style="display:flex;gap:10px;align-items:flex-start;">
+                  <span style="{{ a.tag }}">{{ a.level }}</span>
+                  <span style="font-size:13px;color:#243f43;line-height:1.4;">{{ a.text }}</span>
+                </li>
+              </sc-for>
+            </ul>
+            <div style="margin-top:14px;padding-top:12px;border-top:1px solid #E4EDE9;display:flex;gap:9px;align-items:flex-start;background:#F0F6F2;margin-left:-18px;margin-right:-18px;margin-bottom:-16px;padding:12px 18px 16px;border-radius:0 0 14px 14px;">
+              <span style="display:inline-flex;flex-shrink:0;padding:2px 9px;border-radius:999px;background:#DCEAE2;color:#3d6b52;font-size:10.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;margin-top:1px;">Evidence ready</span>
+              <span style="font-size:13px;color:#3d6b52;line-height:1.4;">24-hour reporting (95%) and feedback (4.1/5) are both above target — strong evidence for the CQC <strong style="font-weight:600;">Safe</strong> and <strong style="font-weight:600;">Caring</strong> statements.</span>
+            </div>
+          </div>
+
+          <div style="{{ chartCard }}">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:2px;">
+              <div>
+                <h2 style="font-size:15.5px;font-weight:600;color:#12333A;">Incidents &amp; complaints by month</h2>
+                <p style="font-size:12px;color:#5B7370;margin-top:2px;">High-severity incidents shown within the bars</p>
+              </div>
+              <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                <span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#5B7370;"><span style="width:10px;height:10px;border-radius:3px;background:#0F5257;"></span>Incidents</span>
+                <span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#5B7370;"><span style="width:10px;height:10px;border-radius:3px;background:#BF4A36;"></span>High severity</span>
+                <span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#5B7370;"><span style="width:14px;height:3px;border-radius:2px;background:#D9A441;"></span>Complaints</span>
+              </div>
+            </div>
+            <div style="height:250px;margin-top:6px;">{{ trendChart }}</div>
+          </div>
+        </div>
+
+        <!-- feedback + category -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;">
+          <div style="{{ chartCard }}">
+            <h2 style="font-size:15.5px;font-weight:600;color:#12333A;">Average feedback score by month</h2>
+            <p style="font-size:12px;color:#5B7370;margin-top:2px;">Dashed line marks the 4.0 target · people we support</p>
+            <div style="height:220px;margin-top:8px;">{{ feedbackChart }}</div>
+          </div>
+          <div style="{{ chartCard }}">
+            <h2 style="font-size:15.5px;font-weight:600;color:#12333A;">Incidents by category &amp; severity</h2>
+            <div style="display:flex;gap:14px;margin:6px 0 2px;flex-wrap:wrap;">
+              <span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#5B7370;"><span style="width:10px;height:10px;border-radius:3px;background:#5F9678;"></span>Low</span>
+              <span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#5B7370;"><span style="width:10px;height:10px;border-radius:3px;background:#D9A441;"></span>Moderate</span>
+              <span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#5B7370;"><span style="width:10px;height:10px;border-radius:3px;background:#BF4A36;"></span>High</span>
+            </div>
+            <div style="height:288px;margin-top:2px;">{{ categoryChart }}</div>
+          </div>
+        </div>
+
+        <!-- source + low themes -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;">
+          <div style="{{ chartCard }}">
+            <h2 style="font-size:15.5px;font-weight:600;color:#12333A;">Complaints by source</h2>
+            <p style="font-size:12px;color:#5B7370;margin-top:2px;">55 complaints received in the period</p>
+            <div style="height:190px;margin-top:8px;">{{ sourceChart }}</div>
+          </div>
+          <div style="{{ chartCard }}">
+            <h2 style="font-size:15.5px;font-weight:600;color:#12333A;">What drives low feedback</h2>
+            <p style="font-size:12px;color:#5B7370;margin-top:2px;">Themes attached to scores of 1–2</p>
+            <ul style="list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:11px;">
+              <sc-for list="{{ lowThemes }}" as="t" hint-placeholder-count="7">
+                <li style="display:flex;align-items:center;gap:12px;">
+                  <span style="width:150px;flex-shrink:0;font-size:12.5px;color:#3d5450;">{{ t.label }}</span>
+                  <span style="flex:1;height:9px;background:#F0F1EF;border-radius:5px;overflow:hidden;"><span style="{{ t.bar }}"></span></span>
+                  <span style="width:22px;text-align:right;font-size:12.5px;font-weight:600;color:#12333A;font-variant-numeric:tabular-nums;">{{ t.count }}</span>
+                </li>
+              </sc-for>
+            </ul>
+          </div>
+        </div>
+
+        <p style="font-size:11.5px;color:#8aa09b;text-align:center;margin-top:4px;">People we support are shown by ClientRef only · Quality data supports supervision conversations — it is not an automated judgement.</p>
+      </div>
+      </sc-if>
+
+      <!-- ======================= OTHER SCREENS (filled in next steps) ======================= -->
+      <sc-if value="{{ isRisk }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:18px;">
+
+        <!-- interpretation note (governance requirement) -->
+        <div role="note" style="display:flex;gap:12px;border:1px solid #BBD4D3;background:#EAF3F3;border-radius:13px;padding:15px 17px;">
+          <span style="display:flex;flex-shrink:0;height:30px;width:30px;align-items:center;justify-content:center;border-radius:9px;background:#0F5257;color:#fff;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2l7 4v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <div>
+            <p style="margin:0;font-size:13.5px;font-weight:600;color:#0B3F43;">How to read this board</p>
+            <p style="margin:4px 0 0;font-size:12.5px;line-height:1.5;color:#2f4f4c;">
+              The Quality Risk Index prioritises who to have a supervision conversation with first — it is <em>not</em> an automated performance judgement. Rates are normalised per 100 completed visits so busier staff are not penalised, conscientious frequent reporters with strong feedback are flagged as a <strong style="font-weight:600;">Strong reporter</strong> rather than a risk, and RAG colouring is withheld where the sample is too small to be fair (fewer than 50 completed visits or 10 feedback responses).
+            </p>
+          </div>
+        </div>
+
+        <!-- filter controls -->
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between;">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">
+            <sc-for list="{{ bandChips }}" as="c" hint-placeholder-count="5">
+              <button onClick="{{ c.go }}" style="{{ c.style }}"><span>{{ c.label }}</span><span style="{{ c.countStyle }}">{{ c.n }}</span></button>
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="position:relative;">
+              <input placeholder="Search staff" aria-label="Search staff" style="background:#fff;border:1px solid #DDE6E3;border-radius:9px;padding:7px 12px 7px 30px;font-family:Inter;font-size:12.5px;color:#12333A;width:150px;">
+              <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#8aa09b;font-size:12px;">⌕</span>
+            </div>
+            <div style="position:relative;">
+              <select aria-label="Filter by role" style="appearance:none;background:#fff;border:1px solid #DDE6E3;border-radius:9px;padding:7px 26px 7px 11px;font-family:Inter;font-size:12.5px;color:#12333A;cursor:pointer;">
+                <option>All roles</option><option>Support Worker</option><option>Senior Support Worker</option><option>PBS Practitioner</option><option>Team Leader</option>
+              </select>
+              <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:#5B7370;font-size:9px;">▼</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RAG legend -->
+        <div style="display:flex;flex-wrap:wrap;gap:16px;padding:11px 15px;background:#fff;border:1px solid #DDE6E3;border-radius:11px;">
+          <span style="display:flex;align-items:center;gap:7px;font-size:11.5px;color:#5B7370;"><span style="width:11px;height:11px;border-radius:3px;background:#BF4A36;"></span><strong style="color:#3d5450;font-weight:600;">Priority attention</strong> QRI ≥ 25</span>
+          <span style="display:flex;align-items:center;gap:7px;font-size:11.5px;color:#5B7370;"><span style="width:11px;height:11px;border-radius:3px;background:#D9A441;"></span><strong style="color:#3d5450;font-weight:600;">Review in supervision</strong> QRI 12–25</span>
+          <span style="display:flex;align-items:center;gap:7px;font-size:11.5px;color:#5B7370;"><span style="width:11px;height:11px;border-radius:3px;background:#5F9678;"></span><strong style="color:#3d5450;font-weight:600;">Within expected range</strong> QRI &lt; 12</span>
+          <span style="display:flex;align-items:center;gap:7px;font-size:11.5px;color:#5B7370;"><span style="width:11px;height:11px;border-radius:3px;background:#c2cec9;"></span><strong style="color:#3d5450;font-weight:600;">Not rated</strong> sample too small</span>
+        </div>
+
+        <!-- staff tiles -->
+        <ul style="list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:13px;">
+          <sc-for list="{{ filteredStaff }}" as="s" hint-placeholder-count="9">
+            <li>
+              <button onClick="{{ s.go }}" style="{{ s.cardStyle }}">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+                  <div style="min-width:0;">
+                    <p style="margin:0;font-family:Sora;font-weight:600;font-size:14.5px;color:#12333A;">{{ s.name }}</p>
+                    <p style="margin:2px 0 0;font-size:11.5px;color:#5B7370;">{{ s.roleTeam }}</p>
+                  </div>
+                  <div style="text-align:right;flex-shrink:0;">
+                    <p style="{{ s.qriStyle }}">{{ s.qri }}</p>
+                    <p style="margin:2px 0 0;font-size:9.5px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#9fb0ab;">QRI</p>
+                  </div>
+                </div>
+                <div style="margin-top:11px;display:flex;flex-wrap:wrap;gap:6px;">
+                  <span style="{{ s.badgeStyle }}">{{ s.badgeLabel }}</span>
+                  <sc-if value="{{ s.strong }}" hint-placeholder-val="{{ false }}">
+                    <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;background:#EAF3F3;color:#0B3F43;font-size:11px;font-weight:600;">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2l7 4v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      Strong reporter</span>
+                  </sc-if>
+                  <sc-if value="{{ s.small }}" hint-placeholder-val="{{ false }}">
+                    <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;background:#FBF3E1;color:#8a6113;font-size:11px;font-weight:600;">Small sample</span>
+                  </sc-if>
+                </div>
+                <dl style="margin:13px 0 0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+                  <div><dt style="font-size:10.5px;color:#8aa09b;margin-bottom:2px;">Incidents</dt><dd style="margin:0;font-size:13px;font-weight:600;color:#12333A;font-variant-numeric:tabular-nums;">{{ s.inc }} <span style="font-weight:400;color:#8aa09b;font-size:11px;">· {{ s.rate }}</span></dd></div>
+                  <div><dt style="font-size:10.5px;color:#8aa09b;margin-bottom:2px;">Upheld compl.</dt><dd style="margin:0;font-size:13px;font-weight:600;color:#12333A;font-variant-numeric:tabular-nums;">{{ s.upheld }}</dd></div>
+                  <div><dt style="font-size:10.5px;color:#8aa09b;margin-bottom:2px;">Feedback</dt><dd style="margin:0;font-size:13px;font-weight:600;color:#12333A;font-variant-numeric:tabular-nums;">{{ s.fb }} <span style="font-weight:400;color:#8aa09b;font-size:11px;">{{ s.fbN }}</span></dd></div>
+                </dl>
+              </button>
+            </li>
+          </sc-for>
+        </ul>
+      </div>
+      </sc-if>
+      <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:18px;">
+
+        <nav aria-label="Breadcrumb" style="font-size:12.5px;color:#5B7370;">
+          <button onClick="{{ goRisk }}" style="border:none;background:none;padding:0;color:#0F5257;font-family:Inter;font-size:12.5px;cursor:pointer;font-weight:500;">Staff risk board</button>
+          <span style="margin:0 6px;color:#b9c8c3;">/</span>Callum Barnes
+        </nav>
+
+        <!-- header -->
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:16px;">
+          <div style="display:flex;gap:14px;align-items:flex-start;">
+            <span style="display:flex;height:52px;width:52px;flex-shrink:0;align-items:center;justify-content:center;border-radius:14px;background:#DCEAE2;color:#0F5257;font-family:Sora;font-weight:600;font-size:18px;">CB</span>
+            <div>
+              <h1 style="font-size:22px;font-weight:600;color:#12333A;">Callum Barnes</h1>
+              <p style="margin:3px 0 0;font-size:13px;color:#5B7370;">Support Worker · The Retreat · started 14 Mar 2019 · 37.5h contracted</p>
+              <div style="margin-top:9px;display:flex;flex-wrap:wrap;gap:6px;">
+                <span style="display:inline-flex;align-items:center;padding:3px 11px;border-radius:999px;background:#F6E1DD;color:#96351F;font-size:11.5px;font-weight:600;">Priority attention</span>
+                <span style="display:inline-flex;align-items:center;padding:3px 11px;border-radius:999px;background:#EEF2F0;color:#5B7370;font-size:11.5px;font-weight:600;">QRI 39</span>
+              </div>
+            </div>
+          </div>
+          <button onClick="{{ goPack }}" style="display:inline-flex;align-items:center;gap:8px;background:#0F5257;color:#fff;border:none;border-radius:10px;padding:11px 18px;font-family:Inter;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 1px 2px rgba(18,51,58,0.12);">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2M6 14h12v7H6z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            Generate supervision pack</button>
+        </div>
+
+        <!-- fairness context note -->
+        <div role="note" style="display:flex;gap:11px;border:1px solid #DDE6E3;background:#F0F6F2;border-radius:12px;padding:13px 16px;">
+          <span style="color:#3d6b52;flex-shrink:0;margin-top:1px;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </span>
+          <p style="margin:0;font-size:12.5px;line-height:1.5;color:#2f4f4c;">This profile supports a supervision conversation and quality improvement — it is <strong style="font-weight:600;">not</strong> an automated performance judgement. Every figure is normalised per 100 completed visits and shown alongside its raw count and the visits that provide its context.</p>
+        </div>
+
+        <!-- KPI strip -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:13px;">
+          <sc-for list="{{ profileKpis }}" as="k" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #DDE6E3;border-radius:13px;padding:15px 16px;box-shadow:0 1px 2px rgba(18,51,58,0.04);">
+              <p style="margin:0;font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:#7a908c;">{{ k.label }}</p>
+              <p style="margin:8px 0 0;font-family:Sora;font-size:24px;font-weight:600;color:#12333A;font-variant-numeric:tabular-nums;line-height:1.05;">{{ k.raw }}</p>
+              <p style="margin:4px 0 0;font-size:12px;color:#5B7370;">{{ k.rate }}</p>
+              <p style="margin:1px 0 0;font-size:11.5px;color:#8aa09b;">{{ k.extra }}</p>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- QRI + feedback -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;">
+          <div style="background:#fff;border:1px solid #DDE6E3;border-radius:14px;padding:17px 18px;box-shadow:0 1px 2px rgba(18,51,58,0.04);">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;">
+              <h2 style="font-size:15.5px;font-weight:600;color:#12333A;">Quality Risk Index: 39</h2>
+              <span style="font-size:11.5px;color:#96351F;font-weight:600;">Priority attention</span>
+            </div>
+            <p style="margin:3px 0 14px;font-size:12px;color:#5B7370;">Exactly which components drive the score</p>
+            <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:13px;">
+              <sc-for list="{{ qriRows }}" as="r" hint-placeholder-count="4">
+                <li>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                    <span style="font-size:12.5px;font-weight:500;color:#12333A;">{{ r.label }}</span>
+                    <span style="font-size:13px;font-weight:600;color:#12333A;font-variant-numeric:tabular-nums;">{{ r.value }}</span>
+                  </div>
+                  <div style="margin-top:5px;height:8px;background:#F0F1EF;border-radius:5px;overflow:hidden;"><span style="{{ r.bar }}"></span></div>
+                  <p style="margin:3px 0 0;font-size:11px;color:#8aa09b;">{{ r.detail }}</p>
+                </li>
+              </sc-for>
+            </ul>
+            <div style="margin-top:15px;padding-top:13px;border-top:1px solid #E4EDE9;display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:13px;font-weight:600;color:#12333A;">Total QRI</span>
+              <span style="font-family:Sora;font-size:20px;font-weight:700;color:#12333A;font-variant-numeric:tabular-nums;">39</span>
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px solid #DDE6E3;border-radius:14px;padding:17px 18px;box-shadow:0 1px 2px rgba(18,51,58,0.04);">
+            <h2 style="font-size:15.5px;font-weight:600;color:#12333A;">Feedback trend</h2>
+            <p style="margin:3px 0 0;font-size:12px;color:#5B7370;">Monthly average score · target 4.0</p>
+            <div style="height:200px;margin-top:8px;">{{ profileFeedbackChart }}</div>
+            <p style="margin:10px 0 6px;font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:#7a908c;">Visits delivered (context for the rates)</p>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              <sc-for list="{{ profileVisits }}" as="v" hint-placeholder-count="12">
+                <span style="background:#F1F4F2;border-radius:6px;padding:4px 8px;font-size:11px;color:#5B7370;font-variant-numeric:tabular-nums;">{{ v }}</span>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <!-- timeline + actions -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;">
+          <div style="background:#fff;border:1px solid #DDE6E3;border-radius:14px;padding:17px 18px;box-shadow:0 1px 2px rgba(18,51,58,0.04);">
+            <h2 style="font-size:15.5px;font-weight:600;color:#12333A;">Event timeline</h2>
+            <p style="margin:3px 0 14px;font-size:12px;color:#5B7370;">Incidents, complaints and low feedback in the period</p>
+            <ul style="list-style:none;margin:0;padding:0;">
+              <sc-for list="{{ profileEvents }}" as="e" hint-placeholder-count="9">
+                <li style="display:flex;gap:11px;padding-bottom:14px;">
+                  <span style="{{ e.dotStyle }}"></span>
+                  <div>
+                    <p style="margin:0;font-size:12.5px;font-weight:500;color:#12333A;">{{ e.title }}</p>
+                    <p style="margin:2px 0 0;font-size:11.5px;color:#8aa09b;">{{ e.meta }}</p>
+                  </div>
+                </li>
+              </sc-for>
+            </ul>
+          </div>
+
+          <div style="background:#fff;border:1px solid #DDE6E3;border-radius:14px;padding:17px 18px;box-shadow:0 1px 2px rgba(18,51,58,0.04);">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+              <div>
+                <h2 style="font-size:15.5px;font-weight:600;color:#12333A;">Actions (2 open)</h2>
+                <p style="margin:3px 0 0;font-size:12px;color:#5B7370;">From supervision, incident reviews and complaint outcomes</p>
+              </div>
+              <button style="border:1px solid #BBD4D3;background:#EAF3F3;color:#0B3F43;border-radius:9px;padding:7px 13px;font-family:Inter;font-size:12.5px;font-weight:600;cursor:pointer;">Add action</button>
+            </div>
+            <ul style="list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:9px;">
+              <sc-for list="{{ profileActions }}" as="a" hint-placeholder-count="6">
+                <li style="display:flex;align-items:flex-start;justify-content:space-between;gap:11px;border:1px solid #E4EDE9;border-radius:11px;padding:11px 13px;">
+                  <div style="min-width:0;">
+                    <p style="margin:0;font-size:12.5px;color:#12333A;line-height:1.4;">{{ a.desc }}</p>
+                    <p style="margin:4px 0 0;font-size:11px;color:#8aa09b;">{{ a.meta }}</p>
+                  </div>
+                  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;">
+                    <span style="{{ a.statusStyle }}">{{ a.status }}</span>
+                    <sc-if value="{{ a.canComplete }}" hint-placeholder-val="{{ false }}">
+                      <button style="border:none;background:none;padding:0;color:#0F5257;font-family:Inter;font-size:11px;font-weight:600;cursor:pointer;">Mark complete</button>
+                    </sc-if>
+                  </div>
+                </li>
+              </sc-for>
+            </ul>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+      <sc-if value="{{ isPack }}" hint-placeholder-val="{{ false }}">
+      <div style="margin:-26px -32px 0;">
+        <!-- toolbar -->
+        <div data-chrome style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border-bottom:1px solid #DDE6E3;padding:12px 22px;position:sticky;top:0;z-index:5;">
+          <button onClick="{{ goProfile }}" style="border:none;background:none;padding:0;color:#0F5257;font-family:Inter;font-size:13px;font-weight:600;cursor:pointer;">← Back to profile</button>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <span style="font-size:11.5px;color:#8aa09b;">Use “Save as PDF” in the print dialog to export</span>
+            <button onClick="{{ printPack }}" style="display:inline-flex;align-items:center;gap:8px;background:#0F5257;color:#fff;border:none;border-radius:9px;padding:9px 17px;font-family:Inter;font-size:13px;font-weight:600;cursor:pointer;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2M6 14h12v7H6z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+              Print / Save as PDF</button>
+          </div>
+        </div>
+
+        <!-- A4 sheet -->
+        <article class="aqi-sheet" style="max-width:820px;margin:26px auto;background:#fff;border:1px solid #DDE6E3;border-radius:6px;box-shadow:0 4px 24px rgba(18,51,58,0.08);padding:44px 46px;">
+
+          <header style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;border-bottom:3px solid #0F5257;padding-bottom:16px;">
+            <div>
+              <p style="margin:0;font-family:Sora;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#0F5257;">Aldanat Care · Confidential</p>
+              <h1 style="margin:7px 0 0;font-family:Sora;font-size:24px;font-weight:700;color:#12333A;">Supervision pack: Callum Barnes</h1>
+              <p style="margin:6px 0 0;font-size:12.5px;color:#5B7370;">Support Worker · The Retreat · Staff ID S005 · started 14 Mar 2019</p>
+            </div>
+            <div style="text-align:right;font-size:11px;color:#8aa09b;line-height:1.6;flex-shrink:0;">
+              <p style="margin:0;">Period: 01 Jul 2025 – 30 Jun 2026</p>
+              <p style="margin:0;">Generated 05 Jul 2026</p>
+              <p style="margin:0;">by Margaret Osei, Director</p>
+            </div>
+          </header>
+
+          <p style="margin:14px 0 0;border:1px solid #DDE6E3;background:#F6F9F7;border-radius:6px;padding:10px 13px;font-size:11px;line-height:1.55;color:#5B7370;">This pack supports a supervision conversation. Metrics are normalised per 100 completed support sessions and must be read alongside professional judgement — they are not an automated performance measure. People we support are identified by reference code only.</p>
+
+          <!-- 1 period summary -->
+          <section class="avoid-break" style="margin-top:26px;">
+            <h2 style="font-family:Sora;font-size:15px;font-weight:600;color:#12333A;">1 · Period summary</h2>
+            <div style="margin-top:11px;display:grid;grid-template-columns:repeat(4,1fr);gap:11px;">
+              <sc-for list="{{ packSummary }}" as="s" hint-placeholder-count="4">
+                <div style="border:1px solid #DDE6E3;border-radius:8px;padding:11px 12px;">
+                  <p style="margin:0;font-size:9.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#8aa09b;">{{ s.label }}</p>
+                  <p style="margin:5px 0 0;font-family:Sora;font-size:19px;font-weight:700;color:#12333A;font-variant-numeric:tabular-nums;">{{ s.value }}</p>
+                  <p style="margin:2px 0 0;font-size:10.5px;color:#5B7370;line-height:1.35;">{{ s.sub }}</p>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <!-- 2 QRI -->
+          <section class="avoid-break" style="margin-top:26px;">
+            <h2 style="font-family:Sora;font-size:15px;font-weight:600;color:#12333A;">2 · Quality Risk Index: 39 <span style="color:#96351F;font-weight:600;">(Priority attention)</span></h2>
+            <table style="margin-top:10px;width:100%;border-collapse:collapse;">
+              <thead><tr>
+                <th style="border-bottom:2px solid #12333A;padding:7px 8px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#3d5450;">Component</th>
+                <th style="border-bottom:2px solid #12333A;padding:7px 8px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#3d5450;">How it is calculated</th>
+                <th style="border-bottom:2px solid #12333A;padding:7px 8px;text-align:right;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#3d5450;">Points</th>
+              </tr></thead>
+              <tbody>
+                <sc-for list="{{ qriRows }}" as="r" hint-placeholder-count="4">
+                  <tr>
+                    <td style="border-bottom:1px solid #E4EDE9;padding:8px;font-size:12px;font-weight:500;color:#12333A;">{{ r.label }}</td>
+                    <td style="border-bottom:1px solid #E4EDE9;padding:8px;font-size:12px;color:#5B7370;">{{ r.detail }}</td>
+                    <td style="border-bottom:1px solid #E4EDE9;padding:8px;text-align:right;font-size:12px;font-weight:600;color:#12333A;font-variant-numeric:tabular-nums;">{{ r.value }}</td>
+                  </tr>
+                </sc-for>
+                <tr>
+                  <td style="padding:8px;font-size:12.5px;font-weight:700;color:#12333A;">Total QRI</td>
+                  <td style="padding:8px;"></td>
+                  <td style="padding:8px;text-align:right;font-size:13px;font-weight:700;color:#12333A;font-variant-numeric:tabular-nums;">39</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- 3 event log -->
+          <section style="margin-top:26px;">
+            <h2 style="font-family:Sora;font-size:15px;font-weight:600;color:#12333A;">3 · Event log (9)</h2>
+            <table style="margin-top:10px;width:100%;border-collapse:collapse;">
+              <thead><tr>
+                <th style="border-bottom:2px solid #12333A;padding:7px 8px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#3d5450;">Date</th>
+                <th style="border-bottom:2px solid #12333A;padding:7px 8px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#3d5450;">Type</th>
+                <th style="border-bottom:2px solid #12333A;padding:7px 8px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#3d5450;">Detail</th>
+                <th style="border-bottom:2px solid #12333A;padding:7px 8px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#3d5450;">Person</th>
+                <th style="border-bottom:2px solid #12333A;padding:7px 8px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#3d5450;">Status / outcome</th>
+              </tr></thead>
+              <tbody>
+                <sc-for list="{{ packEvents }}" as="e" hint-placeholder-count="9">
+                  <tr>
+                    <td style="border-bottom:1px solid #E4EDE9;padding:7px 8px;font-size:11.5px;color:#12333A;white-space:nowrap;">{{ e.date }}</td>
+                    <td style="border-bottom:1px solid #E4EDE9;padding:7px 8px;font-size:11.5px;color:#12333A;">{{ e.type }}</td>
+                    <td style="border-bottom:1px solid #E4EDE9;padding:7px 8px;font-size:11.5px;color:#3d5450;">{{ e.detail }}</td>
+                    <td style="border-bottom:1px solid #E4EDE9;padding:7px 8px;font-size:11.5px;color:#12333A;">{{ e.person }}</td>
+                    <td style="border-bottom:1px solid #E4EDE9;padding:7px 8px;font-size:11.5px;color:#3d5450;">{{ e.status }}</td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- 4 feedback themes -->
+          <section class="avoid-break" style="margin-top:26px;">
+            <h2 style="font-family:Sora;font-size:15px;font-weight:600;color:#12333A;">4 · Feedback themes (verbatim)</h2>
+            <div style="margin-top:11px;display:grid;grid-template-columns:1fr 1fr;gap:9px;">
+              <sc-for list="{{ packThemes }}" as="t" hint-placeholder-count="6">
+                <div style="{{ t.boxStyle }}">
+                  <span style="font-size:12px;font-weight:600;color:#12333A;">“{{ t.theme }}”</span>
+                  <span style="font-size:11px;color:#5B7370;"> · {{ t.meta }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <!-- 5 previous actions -->
+          <section style="margin-top:26px;">
+            <h2 style="font-family:Sora;font-size:15px;font-weight:600;color:#12333A;">5 · Previous actions and their status</h2>
+            <table style="margin-top:10px;width:100%;border-collapse:collapse;">
+              <thead><tr>
+                <th style="border-bottom:2px solid #12333A;padding:7px 8px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#3d5450;">Created</th>
+                <th style="border-bottom:2px solid #12333A;padding:7px 8px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#3d5450;">Source</th>
+                <th style="border-bottom:2px solid #12333A;padding:7px 8px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#3d5450;">Action</th>
+                <th style="border-bottom:2px solid #12333A;padding:7px 8px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#3d5450;">Owner</th>
+                <th style="border-bottom:2px solid #12333A;padding:7px 8px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#3d5450;">Due</th>
+                <th style="border-bottom:2px solid #12333A;padding:7px 8px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#3d5450;">Status</th>
+              </tr></thead>
+              <tbody>
+                <sc-for list="{{ packActions }}" as="a" hint-placeholder-count="5">
+                  <tr>
+                    <td style="border-bottom:1px solid #E4EDE9;padding:7px 8px;font-size:11.5px;color:#12333A;white-space:nowrap;">{{ a.created }}</td>
+                    <td style="border-bottom:1px solid #E4EDE9;padding:7px 8px;font-size:11.5px;color:#3d5450;">{{ a.source }}</td>
+                    <td style="border-bottom:1px solid #E4EDE9;padding:7px 8px;font-size:11.5px;color:#12333A;">{{ a.action }}</td>
+                    <td style="border-bottom:1px solid #E4EDE9;padding:7px 8px;font-size:11.5px;color:#3d5450;">{{ a.owner }}</td>
+                    <td style="border-bottom:1px solid #E4EDE9;padding:7px 8px;font-size:11.5px;color:#12333A;white-space:nowrap;">{{ a.due }}</td>
+                    <td style="border-bottom:1px solid #E4EDE9;padding:7px 8px;font-size:11.5px;font-weight:600;color:#3d5450;">{{ a.status }}</td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- 6 blank agreed actions -->
+          <section class="print-break" style="margin-top:26px;">
+            <h2 style="font-family:Sora;font-size:15px;font-weight:600;color:#12333A;">6 · Actions agreed in this supervision</h2>
+            <table style="margin-top:10px;width:100%;border-collapse:collapse;">
+              <thead><tr>
+                <th style="border-bottom:2px solid #12333A;padding:7px 8px;text-align:left;width:50%;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#3d5450;">Agreed action</th>
+                <th style="border-bottom:2px solid #12333A;padding:7px 8px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#3d5450;">Owner</th>
+                <th style="border-bottom:2px solid #12333A;padding:7px 8px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#3d5450;">Due date</th>
+                <th style="border-bottom:2px solid #12333A;padding:7px 8px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#3d5450;">Review</th>
+              </tr></thead>
+              <tbody>
+                <sc-for list="{{ packBlankRows }}" as="i" hint-placeholder-count="5">
+                  <tr>
+                    <td style="border-bottom:1px solid #C7D3CF;padding:8px;"><span style="display:block;height:22px;"></span></td>
+                    <td style="border-bottom:1px solid #C7D3CF;padding:8px;"></td>
+                    <td style="border-bottom:1px solid #C7D3CF;padding:8px;"></td>
+                    <td style="border-bottom:1px solid #C7D3CF;padding:8px;"></td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+            <div style="margin-top:44px;display:grid;grid-template-columns:1fr 1fr;gap:40px;">
+              <div style="border-top:1px solid #12333A;padding-top:6px;font-size:11px;color:#5B7370;">Staff member signature · date</div>
+              <div style="border-top:1px solid #12333A;padding-top:6px;font-size:11px;color:#5B7370;">Supervisor signature · date</div>
+            </div>
+          </section>
+
+          <footer style="margin-top:34px;border-top:1px solid #DDE6E3;padding-top:12px;font-size:9.5px;color:#8aa09b;line-height:1.5;">Aldanat Quality Intelligence · Confidential HR record — store in the staff member's supervision file · Data minimised: no names of people we support appear in this document.</footer>
+        </article>
+      </div>
+      </sc-if>
+      <sc-if value="{{ isCqc }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:20px;">
+
+        <!-- inspection-ready banner -->
+        <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;border:1px solid #BBD4D3;background:#EAF3F3;border-radius:13px;padding:15px 18px;">
+          <div style="display:flex;gap:12px;">
+            <span style="display:flex;flex-shrink:0;height:32px;width:32px;align-items:center;justify-content:center;border-radius:9px;background:#0F5257;color:#fff;">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2l7 4v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <div>
+              <p style="margin:0;font-size:13.5px;font-weight:600;color:#0B3F43;">Inspection-ready evidence</p>
+              <p style="margin:3px 0 0;font-size:12.5px;color:#2f4f4c;max-width:640px;line-height:1.45;">AQI metrics are mapped to the CQC single assessment framework quality statements for <strong style="font-weight:600;">Safe</strong> and <strong style="font-weight:600;">Well-led</strong>. Every figure is drawn from source records and is exportable as a dated evidence pack.</p>
+            </div>
+          </div>
+          <button onClick="{{ exportPack }}" data-chrome style="display:inline-flex;flex-shrink:0;align-items:center;gap:8px;background:#0F5257;color:#fff;border:none;border-radius:10px;padding:11px 18px;font-family:Inter;font-size:13.5px;font-weight:600;cursor:pointer;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Export evidence pack</button>
+        </div>
+
+        <!-- SAFE -->
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <h2 style="font-family:Sora;font-size:17px;font-weight:600;color:#0F5257;">Safe</h2>
+            <span style="height:1px;flex:1;background:#DDE6E3;"></span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:15px;">
+            <sc-for list="{{ cqcSafe }}" as="st" hint-placeholder-count="3">
+              <div style="background:#fff;border:1px solid #DDE6E3;border-radius:14px;padding:16px 18px;box-shadow:0 1px 2px rgba(18,51,58,0.04);">
+                <h3 style="font-family:Sora;font-size:14.5px;font-weight:600;color:#12333A;">{{ st.title }}</h3>
+                <p style="margin:6px 0 0;font-size:11.5px;font-style:italic;color:#8aa09b;line-height:1.5;">“{{ st.quote }}”</p>
+                <ul style="list-style:none;margin:13px 0 0;padding:0;display:flex;flex-direction:column;gap:11px;">
+                  <sc-for list="{{ st.evidence }}" as="e" hint-placeholder-count="3">
+                    <li style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+                      <div><p style="margin:0;font-size:12.5px;color:#3d5450;">{{ e.label }}</p><p style="margin:1px 0 0;font-size:11px;color:#9fb0ab;">{{ e.target }}</p></div>
+                      <span style="{{ e.pillStyle }}">{{ e.value }}</span>
+                    </li>
+                  </sc-for>
+                </ul>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- WELL-LED -->
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <h2 style="font-family:Sora;font-size:17px;font-weight:600;color:#0F5257;">Well-led</h2>
+            <span style="height:1px;flex:1;background:#DDE6E3;"></span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:15px;">
+            <sc-for list="{{ cqcWellLed }}" as="st" hint-placeholder-count="2">
+              <div style="background:#fff;border:1px solid #DDE6E3;border-radius:14px;padding:16px 18px;box-shadow:0 1px 2px rgba(18,51,58,0.04);">
+                <h3 style="font-family:Sora;font-size:14.5px;font-weight:600;color:#12333A;">{{ st.title }}</h3>
+                <p style="margin:6px 0 0;font-size:11.5px;font-style:italic;color:#8aa09b;line-height:1.5;">“{{ st.quote }}”</p>
+                <ul style="list-style:none;margin:13px 0 0;padding:0;display:flex;flex-direction:column;gap:11px;">
+                  <sc-for list="{{ st.evidence }}" as="e" hint-placeholder-count="3">
+                    <li style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+                      <div><p style="margin:0;font-size:12.5px;color:#3d5450;">{{ e.label }}</p><p style="margin:1px 0 0;font-size:11px;color:#9fb0ab;">{{ e.target }}</p></div>
+                      <span style="{{ e.pillStyle }}">{{ e.value }}</span>
+                    </li>
+                  </sc-for>
+                </ul>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- notifiable log -->
+        <div style="background:#fff;border:1px solid #DDE6E3;border-radius:14px;padding:17px 18px;box-shadow:0 1px 2px rgba(18,51,58,0.04);">
+          <h2 style="font-family:Sora;font-size:15.5px;font-weight:600;color:#12333A;">Notifiable incident log</h2>
+          <p style="margin:3px 0 12px;font-size:12px;color:#5B7370;">Events notifiable to CQC under Regulation 18, with reporting timeliness · showing 9 of 19</p>
+          <div class="aqi-scroll" style="overflow-x:auto;">
+            <table style="width:100%;min-width:680px;border-collapse:collapse;">
+              <thead><tr>
+                <sc-for list="{{ notifHeads }}" as="c" hint-placeholder-count="8">
+                  <th style="border-bottom:2px solid #DDE6E3;padding:8px 9px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#7a908c;">{{ c }}</th>
+                </sc-for>
+              </tr></thead>
+              <tbody>
+                <sc-for list="{{ cqcNotifiable }}" as="n" hint-placeholder-count="9">
+                  <tr style="border-bottom:1px solid #EEF2F0;">
+                    <td style="padding:8px 9px;font-size:12px;color:#12333A;white-space:nowrap;">{{ n.date }}</td>
+                    <td style="padding:8px 9px;font-size:12px;color:#5B7370;font-variant-numeric:tabular-nums;">{{ n.ref }}</td>
+                    <td style="padding:8px 9px;font-size:12px;color:#12333A;">{{ n.cat }}</td>
+                    <td style="padding:8px 9px;font-size:12px;color:#3d5450;">{{ n.sev }}</td>
+                    <td style="padding:8px 9px;font-size:12px;color:#3d5450;">{{ n.svc }}</td>
+                    <td style="padding:8px 9px;font-size:12px;color:#3d5450;">{{ n.person }}</td>
+                    <td style="padding:8px 9px;font-size:12px;{{ n.in24Style }}">{{ n.in24 }}</td>
+                    <td style="padding:8px 9px;font-size:12px;color:#3d5450;white-space:nowrap;">{{ n.status }}</td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- timeliness + learning -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;">
+          <div style="background:#fff;border:1px solid #DDE6E3;border-radius:14px;padding:17px 18px;box-shadow:0 1px 2px rgba(18,51,58,0.04);">
+            <h2 style="font-family:Sora;font-size:15.5px;font-weight:600;color:#12333A;">Complaint handling timeliness</h2>
+            <p style="margin:3px 0 14px;font-size:12px;color:#5B7370;">Resolved complaints closed within 28 days</p>
+            <div style="display:flex;align-items:center;gap:16px;">
+              <span style="font-family:Sora;font-size:30px;font-weight:700;color:#12333A;font-variant-numeric:tabular-nums;">78%</span>
+              <div style="flex:1;">
+                <div style="height:9px;background:#F0F1EF;border-radius:5px;overflow:hidden;"><span style="display:block;height:100%;width:78%;background:#5F9678;border-radius:5px;"></span></div>
+                <p style="margin:7px 0 0;font-size:11.5px;color:#8aa09b;line-height:1.4;">38 of 49 resolved within 28 days · target 75% · average 21 days · 6 still open</p>
+              </div>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #DDE6E3;border-radius:14px;padding:17px 18px;box-shadow:0 1px 2px rgba(18,51,58,0.04);">
+            <h2 style="font-family:Sora;font-size:15.5px;font-weight:600;color:#12333A;">Learning actions</h2>
+            <p style="margin:3px 0 14px;font-size:12px;color:#5B7370;">Raised from incidents, complaints and supervision</p>
+            <div style="display:flex;align-items:center;gap:16px;">
+              <span style="font-family:Sora;font-size:30px;font-weight:700;color:#12333A;font-variant-numeric:tabular-nums;">82%</span>
+              <div style="flex:1;">
+                <div style="height:9px;background:#F0F1EF;border-radius:5px;overflow:hidden;"><span style="display:block;height:100%;width:82%;background:#D9A441;border-radius:5px;"></span></div>
+                <p style="margin:7px 0 0;font-size:11.5px;color:#8aa09b;line-height:1.4;">46 of 56 completed · 2 overdue · 8 in progress</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+      <sc-if value="{{ isStub }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border:1px dashed #cdd9d5;border-radius:14px;background:#fff;padding:64px 24px;text-align:center;">
+          <h2 style="font-size:16px;font-weight:600;color:#3d5450;">{{ pageTitle }}</h2>
+          <p style="font-size:13px;color:#7a908c;max-width:420px;">This secondary screen uses the same AQI design system. It is designed after the five priority screens.</p>
+        </div>
+      </sc-if>
+
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { page: "overview", period: 12, navOpen: false, band: "All" };
+
+  go(page) { this.setState({ page, navOpen: false }); window.scrollTo(0, 0); }
+
+  navBase(active) {
+    return {
+      display: "flex", alignItems: "center", gap: "11px",
+      padding: "9px 12px", borderRadius: "9px", border: "none",
+      width: "100%", textAlign: "left", cursor: "pointer",
+      fontFamily: "Inter", fontSize: "13.5px",
+      fontWeight: active ? 600 : 500,
+      background: active ? "#0F5257" : "transparent",
+      color: active ? "#ffffff" : "#3d5450",
+      transition: "background .12s",
+    };
+  }
+  dotStyle(active) {
+    return `width:7px;height:7px;border-radius:2px;flex-shrink:0;background:${active ? "#DCEAE2" : "#b9c8c3"};`;
+  }
+
+  makeNav(items) {
+    return items.map((it) => {
+      const active = this.state.page === it.key || (it.alias || []).includes(this.state.page);
+      return {
+        key: it.key, label: it.label,
+        style: this.navBase(active),
+        dot: this.dotStyle(active),
+        styleMobile: {
+          display: "block", width: "100%", textAlign: "left",
+          padding: "10px 12px", borderRadius: "9px", border: "none", cursor: "pointer",
+          fontFamily: "Inter", fontSize: "14px", fontWeight: active ? 600 : 500,
+          background: active ? "#EAF3F3" : "transparent",
+          color: active ? "#0B3F43" : "#3d5450",
+        },
+        go: () => this.go(it.key),
+      };
+    });
+  }
+
+  // ---------- charts ----------
+  C = { petrol: "#0F5257", sage: "#5F9678", amber: "#D9A441", rust: "#BF4A36", ink: "#12333A", grid: "#DDE6E3", sub: "#5B7370" };
+
+  trendChart() {
+    const h = React.createElement, C = this.C;
+    const inc = [12,15,13,16,14,18,15,12,14,13,11,10];
+    const high = [1,2,1,2,1,3,1,0,1,1,1,0];
+    const comp = [4,5,3,6,5,4,5,4,5,4,6,4];
+    const labels = ["Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar","Apr","May","Jun"];
+    const W=660,H=250,L=30,R=14,T=12,B=32, pw=W-L-R, ph=H-T-B, maxY=20;
+    const band=pw/12, y=v=>T+ph-(v/maxY)*ph, els=[];
+    [0,5,10,15,20].forEach(g=>{els.push(h("line",{key:"g"+g,x1:L,x2:W-R,y1:y(g),y2:y(g),stroke:C.grid,strokeWidth:1}));els.push(h("text",{key:"yl"+g,x:L-6,y:y(g)+3,textAnchor:"end",fontSize:10,fill:C.sub},g));});
+    const bw=16;
+    inc.forEach((v,i)=>{const cx=L+band*i+band/2,x=cx-bw/2,ih=(v/maxY)*ph,iy=T+ph-ih;
+      els.push(h("rect",{key:"i"+i,x,y:iy,width:bw,height:ih,rx:3,fill:C.petrol}));
+      if(high[i]>0){els.push(h("rect",{key:"hi"+i,x,y:iy,width:bw,height:(high[i]/maxY)*ph,rx:3,fill:C.rust}));}
+      els.push(h("text",{key:"xl"+i,x:cx,y:H-B+16,textAnchor:"middle",fontSize:10,fill:C.sub},labels[i]));});
+    els.push(h("polyline",{key:"cl",points:comp.map((v,i)=>`${L+band*i+band/2},${y(v)}`).join(" "),fill:"none",stroke:C.amber,strokeWidth:2.5}));
+    comp.forEach((v,i)=>els.push(h("circle",{key:"cd"+i,cx:L+band*i+band/2,cy:y(v),r:3.2,fill:"#fff",stroke:C.amber,strokeWidth:2})));
+    return h("svg",{viewBox:`0 0 ${W} ${H}`,width:"100%",height:"100%",preserveAspectRatio:"xMidYMid meet",style:{fontFamily:"Inter,sans-serif"}},els);
+  }
+
+  feedbackChart() {
+    const h = React.createElement, C = this.C;
+    const vals=[4.0,4.1,4.2,4.0,3.9,3.9,4.1,4.2,4.2,4.1,4.3,4.2];
+    const labels=["Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar","Apr","May","Jun"];
+    const W=660,H=220,L=26,R=14,T=12,B=30, pw=W-L-R, ph=H-T-B, min=3, max=5;
+    const band=pw/12, y=v=>T+ph-((v-min)/(max-min))*ph, els=[];
+    [3,3.5,4,4.5,5].forEach(g=>{els.push(h("line",{key:"g"+g,x1:L,x2:W-R,y1:y(g),y2:y(g),stroke:C.grid,strokeWidth:1}));els.push(h("text",{key:"yl"+g,x:L-6,y:y(g)+3,textAnchor:"end",fontSize:10,fill:C.sub},g.toFixed(1)));});
+    els.push(h("line",{key:"tgt",x1:L,x2:W-R,y1:y(4),y2:y(4),stroke:C.sage,strokeWidth:1.5,strokeDasharray:"6 4"}));
+    els.push(h("text",{key:"tl",x:W-R,y:y(4)-6,textAnchor:"end",fontSize:10,fontWeight:600,fill:C.sage},"Target 4.0"));
+    const px=i=>L+band*i+band/2;
+    els.push(h("polyline",{key:"ln",points:vals.map((v,i)=>`${px(i)},${y(v)}`).join(" "),fill:"none",stroke:C.petrol,strokeWidth:2.5,strokeLinejoin:"round"}));
+    vals.forEach((v,i)=>{els.push(h("circle",{key:"d"+i,cx:px(i),cy:y(v),r:3.2,fill:"#fff",stroke:C.petrol,strokeWidth:2}));els.push(h("text",{key:"x"+i,x:px(i),y:H-B+16,textAnchor:"middle",fontSize:10,fill:C.sub},labels[i]));});
+    return h("svg",{viewBox:`0 0 ${W} ${H}`,width:"100%",height:"100%",preserveAspectRatio:"xMidYMid meet",style:{fontFamily:"Inter,sans-serif"}},els);
+  }
+
+  categoryChart() {
+    const h = React.createElement, C = this.C;
+    const rows=[["Behaviour that challenges",30,12,4],["Medication error",14,7,2],["Environment / H&S",13,3,0],["Physical intervention",9,6,1],["Fall",10,4,2],["Safeguarding concern",5,4,2],["Self-harm",5,3,2],["Health emergency",6,3,1],["Injury (unexplained)",5,3,0],["Missing person",4,3,0]];
+    const W=660,H=288,LX=150,RX=W-14, plot=RX-LX, maxT=46, els=[];
+    const rowH=H/rows.length, bh=13;
+    const sx=v=>(v/maxT)*plot;
+    rows.forEach((r,i)=>{const cy=i*rowH+rowH/2, by=cy-bh/2;
+      els.push(h("text",{key:"l"+i,x:LX-8,y:cy+3.5,textAnchor:"end",fontSize:10.5,fill:"#3d5450"},r[0]));
+      let x=LX;
+      [[r[1],C.sage],[r[2],C.amber],[r[3],C.rust]].forEach(([v,col],j)=>{const w=sx(v);if(w>0){els.push(h("rect",{key:i+"-"+j,x,y:by,width:w,height:bh,fill:col,rx:j===2?2:0}));x+=w;}});
+      els.push(h("text",{key:"t"+i,x:x+6,y:cy+3.5,fontSize:10.5,fontWeight:600,fill:"#5B7370"},r[1]+r[2]+r[3]));});
+    return h("svg",{viewBox:`0 0 ${W} ${H}`,width:"100%",height:"100%",preserveAspectRatio:"xMidYMid meet",style:{fontFamily:"Inter,sans-serif"}},els);
+  }
+
+  sourceChart() {
+    const h = React.createElement, C = this.C;
+    const rows=[["Family / relative",21],["Person supported",9],["Local authority",8],["Other professional",7],["Advocate",5],["Anonymous",5]];
+    const W=660,H=190,LX=150,RX=W-24, plot=RX-LX, maxT=22, els=[];
+    const rowH=H/rows.length, bh=14, sx=v=>(v/maxT)*plot;
+    rows.forEach((r,i)=>{const cy=i*rowH+rowH/2, by=cy-bh/2, w=sx(r[1]);
+      els.push(h("text",{key:"l"+i,x:LX-8,y:cy+3.5,textAnchor:"end",fontSize:10.5,fill:"#3d5450"},r[0]));
+      els.push(h("rect",{key:"b"+i,x:LX,y:by,width:w,height:bh,fill:C.petrol,rx:3}));
+      els.push(h("text",{key:"t"+i,x:LX+w+6,y:cy+3.5,fontSize:10.5,fontWeight:600,fill:"#5B7370"},r[1]));});
+    return h("svg",{viewBox:`0 0 ${W} ${H}`,width:"100%",height:"100%",preserveAspectRatio:"xMidYMid meet",style:{fontFamily:"Inter,sans-serif"}},els);
+  }
+
+  // ---------- staff (risk board) ----------
+  staffData() {
+    return [
+      { id:"S005", name:"Callum Barnes", role:"Support Worker", team:"The Retreat", band:"Priority", qri:39, inc:15, rate:"1.7", high:3, cUp:3, cTot:4, fb:"3.0", fbN:26, strong:false, small:false },
+      { id:"S012", name:"Marek Novak", role:"Support Worker", team:"Peter House", band:"Priority", qri:31, inc:13, rate:"1.5", high:2, cUp:2, cTot:3, fb:"3.2", fbN:22, strong:false, small:false },
+      { id:"S026", name:"Yusuf Kamara", role:"Support Worker", team:"Community Outreach", band:"Priority", qri:27, inc:12, rate:"1.6", high:2, cUp:2, cTot:2, fb:"3.3", fbN:19, strong:false, small:false },
+      { id:"S004", name:"Amara Price", role:"Support Worker", team:"The Retreat", band:"Review", qri:17, inc:8, rate:"0.9", high:1, cUp:1, cTot:1, fb:"3.7", fbN:24, strong:false, small:false },
+      { id:"S021", name:"Grace Mensah", role:"Support Worker", team:"Senna House", band:"Review", qri:15, inc:7, rate:"0.9", high:1, cUp:1, cTot:1, fb:"3.6", fbN:21, strong:false, small:false },
+      { id:"S010", name:"Daniel Clarke", role:"Senior Support Worker", team:"Peter House", band:"Review", qri:13, inc:9, rate:"1.0", high:0, cUp:1, cTot:2, fb:"3.8", fbN:23, strong:false, small:false },
+      { id:"S019", name:"Naomi Okafor", role:"Support Worker", team:"Senna House", band:"Stable", qri:5, inc:13, rate:"1.5", high:0, cUp:0, cTot:0, fb:"4.7", fbN:25, strong:true, small:false },
+      { id:"S001", name:"Priya Nair", role:"Team Leader", team:"The Retreat", band:"Stable", qri:3, inc:2, rate:"0.3", high:0, cUp:0, cTot:0, fb:"4.5", fbN:20, strong:false, small:false },
+      { id:"S009", name:"Marcus Bell", role:"Team Leader", team:"Peter House", band:"Stable", qri:4, inc:3, rate:"0.3", high:0, cUp:0, cTot:1, fb:"4.4", fbN:22, strong:false, small:false },
+      { id:"S017", name:"Sofia Keane", role:"Team Leader", team:"Senna House", band:"Stable", qri:2, inc:2, rate:"0.2", high:0, cUp:0, cTot:0, fb:"4.6", fbN:19, strong:false, small:false },
+      { id:"S023", name:"Tom Aldous", role:"Team Leader", team:"Community Outreach", band:"Stable", qri:3, inc:2, rate:"0.3", high:0, cUp:0, cTot:0, fb:"4.4", fbN:18, strong:false, small:false },
+      { id:"S007", name:"Esther Reid", role:"Support Worker", team:"The Retreat", band:"Stable", qri:7, inc:5, rate:"0.6", high:0, cUp:0, cTot:1, fb:"4.2", fbN:23, strong:false, small:false },
+      { id:"S013", name:"Femi Adeyemi", role:"Support Worker", team:"Peter House", band:"Stable", qri:9, inc:6, rate:"0.7", high:1, cUp:0, cTot:1, fb:"4.0", fbN:21, strong:false, small:false },
+      { id:"S006", name:"Hannah Webb", role:"Senior Support Worker", team:"The Retreat", band:"Stable", qri:6, inc:4, rate:"0.5", high:0, cUp:0, cTot:0, fb:"4.3", fbN:22, strong:false, small:false },
+      { id:"S027", name:"Oliver Sowah", role:"Support Worker", team:"Community Outreach", band:"Stable", qri:8, inc:6, rate:"0.8", high:0, cUp:0, cTot:1, fb:"4.1", fbN:20, strong:false, small:false },
+      { id:"S014", name:"Ruth Lawson", role:"PBS Practitioner", team:"Peter House", band:"Stable", qri:5, inc:4, rate:"0.5", high:0, cUp:0, cTot:0, fb:"4.3", fbN:24, strong:false, small:false },
+      { id:"S028", name:"Eve Turner", role:"Support Worker", team:"Community Outreach", band:"NotRated", qri:6, inc:2, rate:"—", high:0, cUp:0, cTot:0, fb:"—", fbN:2, strong:false, small:true },
+      { id:"S020", name:"Wiktor Vasile", role:"Support Worker", team:"Senna House", band:"NotRated", qri:4, inc:1, rate:"—", high:0, cUp:0, cTot:0, fb:"—", fbN:4, strong:false, small:true },
+    ];
+  }
+  bandMeta(band) {
+    return {
+      Priority: { label:"Priority attention", edge:"#BF4A36", badgeBg:"#F6E1DD", badgeCol:"#96351F" },
+      Review:   { label:"Review in supervision", edge:"#D9A441", badgeBg:"#F8EDD8", badgeCol:"#8a6113" },
+      Stable:   { label:"Within expected range", edge:"#5F9678", badgeBg:"#E4EFE8", badgeCol:"#3d6b52" },
+      NotRated: { label:"Not rated — small sample", edge:"#c2cec9", badgeBg:"#EEF2F0", badgeCol:"#5B7370" },
+    }[band];
+  }
+
+  // ---------- staff profile (Callum Barnes) ----------
+  profileFeedbackChart() {
+    const h = React.createElement, C = this.C;
+    const vals=[3.2,2.8,3.0,3.4,2.6,2.9,3.1,3.0,2.7,3.2,2.8,3.1];
+    const labels=["Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar","Apr","May","Jun"];
+    const W=620,H=210,L=24,R=12,T=12,B=28, pw=W-L-R, ph=H-T-B, min=1, max=5;
+    const band=pw/12, y=v=>T+ph-((v-min)/(max-min))*ph, els=[];
+    [1,2,3,4,5].forEach(g=>{els.push(h("line",{key:"g"+g,x1:L,x2:W-R,y1:y(g),y2:y(g),stroke:C.grid,strokeWidth:1}));els.push(h("text",{key:"yl"+g,x:L-5,y:y(g)+3,textAnchor:"end",fontSize:10,fill:C.sub},g));});
+    els.push(h("line",{key:"t",x1:L,x2:W-R,y1:y(4),y2:y(4),stroke:C.sage,strokeWidth:1.5,strokeDasharray:"6 4"}));
+    els.push(h("text",{key:"tl",x:W-R,y:y(4)-5,textAnchor:"end",fontSize:10,fontWeight:600,fill:C.sage},"Target 4.0"));
+    const px=i=>L+band*i+band/2;
+    els.push(h("polyline",{key:"ln",points:vals.map((v,i)=>`${px(i)},${y(v)}`).join(" "),fill:"none",stroke:C.petrol,strokeWidth:2.5,strokeLinejoin:"round"}));
+    vals.forEach((v,i)=>{els.push(h("circle",{key:"d"+i,cx:px(i),cy:y(v),r:3,fill:"#fff",stroke:C.petrol,strokeWidth:2}));els.push(h("text",{key:"x"+i,x:px(i),y:H-B+15,textAnchor:"middle",fontSize:9.5,fill:C.sub},labels[i]));});
+    return h("svg",{viewBox:`0 0 ${W} ${H}`,width:"100%",height:"100%",preserveAspectRatio:"xMidYMid meet",style:{fontFamily:"Inter,sans-serif"}},els);
+  }
+  qriRows() {
+    const rows=[
+      { label:"Incident rate", detail:"1.7 incidents per 100 visits × 2", value:3, max:15 },
+      { label:"High severity incidents", detail:"3 high-severity incidents × 5", value:15, max:15 },
+      { label:"Upheld / partially upheld complaints", detail:"3 complaints × 4", value:12, max:15 },
+      { label:"Feedback scores of 1–2", detail:"9 low scores × 1", value:9, max:15 },
+    ];
+    return rows.map((r)=>({ ...r, bar:`display:block;height:100%;width:${(r.value/r.max)*100}%;background:#0F5257;border-radius:5px;` }));
+  }
+  profileEvents() {
+    const col={High:"#BF4A36",Moderate:"#D9A441",Low:"#5F9678",Complaint:"#0F5257",Feedback:"#c76a56"};
+    const E=[
+      { dot:col.High, title:"Behaviour that challenges · High severity", meta:"12 Jun 2026 · RT-03 · CQC notifiable · Under review" },
+      { dot:col.Feedback, title:"Feedback score 2/5 · Consistency of staff", meta:"28 May 2026 · RT-01 · Easy-read survey" },
+      { dot:col.Moderate, title:"Medication error · Moderate severity", meta:"15 May 2026 · RT-05 · Closed" },
+      { dot:col.Complaint, title:"Complaint from family · Staff conduct", meta:"30 Apr 2026 · RT-03 · Partially upheld" },
+      { dot:col.High, title:"Physical intervention used · High severity", meta:"08 Apr 2026 · RT-02 · reported late · Closed" },
+      { dot:col.Moderate, title:"Fall · Moderate severity", meta:"22 Mar 2026 · RT-06 · Closed" },
+      { dot:col.Feedback, title:"Feedback score 2/5 · Being listened to", meta:"05 Mar 2026 · RT-04 · Keyworker session" },
+      { dot:col.Complaint, title:"Complaint from advocate · Communication with family", meta:"02 Feb 2026 · RT-01 · Upheld" },
+      { dot:col.High, title:"Medication error · High severity", meta:"14 Jan 2026 · RT-05 · CQC notifiable · Closed" },
+    ];
+    return E.map((e)=>({ ...e, dotStyle:`margin-top:5px;height:9px;width:9px;flex-shrink:0;border-radius:50%;background:${e.dot};` }));
+  }
+  profileActions() {
+    const st={Completed:["#E4EFE8","#3d6b52"],"In progress":["#EAF3F3","#0B3F43"],Open:["#EEF2F0","#5B7370"],Overdue:["#F6E1DD","#96351F"]};
+    const A=[
+      { desc:"Refresher training: medication administration and MAR recording", meta:"Supervision · created 12 May 2026 · due 09 Jun 2026 · Priya Nair", status:"Overdue" },
+      { desc:"Review communication passports for allocated keywork clients", meta:"Supervision · created 20 Jun 2026 · due 18 Jul 2026 · Priya Nair", status:"In progress" },
+      { desc:"Shadow shifts with senior support worker to embed PBS strategies", meta:"Incident review · created 09 Apr 2026 · due 21 May 2026 · Priya Nair", status:"Completed" },
+      { desc:"Agree reflective log after every physical intervention", meta:"Incident review · created 08 Apr 2026 · due 22 Apr 2026 · Priya Nair", status:"Completed" },
+      { desc:"Complete safeguarding adults level 2 refresher", meta:"Supervision · created 15 Mar 2026 · due 30 Apr 2026 · Registered Manager", status:"Completed" },
+      { desc:"Written reflection on dignity in personal care, reviewed in supervision", meta:"Complaint outcome · created 02 Feb 2026 · due 16 Feb 2026 · Priya Nair", status:"Completed" },
+    ];
+    return A.map((a)=>({ ...a, statusStyle:`display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:${st[a.status][0]};color:${st[a.status][1]};`, canComplete:a.status!=="Completed" }));
+  }
+
+  // ---------- CQC evidence ----------
+  cqcGroups() {
+    const pill = (met) => met
+      ? `display:inline-flex;flex-shrink:0;align-items:center;padding:3px 10px;border-radius:999px;background:#E4EFE8;color:#3d6b52;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;`
+      : `display:inline-flex;flex-shrink:0;align-items:center;padding:3px 10px;border-radius:999px;background:#F8EDD8;color:#8a6113;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;`;
+    const map = (arr) => arr.map((st) => ({ ...st, evidence: st.evidence.map((e) => ({ ...e, pillStyle: pill(e.met) })) }));
+    const safe = map([
+      { title:"Learning culture", quote:"We have a proactive and positive culture of safety based on openness and honesty, in which safety events are investigated and reported thoroughly, and lessons are learned.", evidence:[
+        { label:"Incidents reported within 24 hours", target:"target 90% · met", value:"95%", met:true },
+        { label:"Incidents logged in period", target:"all staff report through AQI", value:"163", met:true },
+        { label:"Learning actions completed", target:"46 of 56 actions", value:"82%", met:true },
+      ]},
+      { title:"Safeguarding", quote:"We work with people to understand what being safe means to them and work with our partners to develop the best way to achieve this.", evidence:[
+        { label:"CQC notifiable events (Reg 18)", target:"full log with dates below", value:"19", met:true },
+        { label:"High severity incidents", target:"each triggers a management review", value:"14", met:true },
+      ]},
+      { title:"Involving people to manage risks", quote:"We work with people to understand and manage risks by thinking holistically, so that care meets their needs in a way that is safe and supportive.", evidence:[
+        { label:"Support sessions delivered", target:"0.9% missed", value:"23,860", met:true },
+        { label:"Average feedback from people supported", target:"target 4.0", value:"4.1/5", met:true },
+      ]},
+    ]);
+    const wellLed = map([
+      { title:"Governance, management and sustainability", quote:"We have clear responsibilities, roles, systems of accountability and good governance to manage and deliver good quality, sustainable care.", evidence:[
+        { label:"Complaints resolved within 28 days", target:"target 75% · avg 21 days", value:"78%", met:true },
+        { label:"Complaints upheld", target:"of decided complaints", value:"34%", met:true },
+        { label:"Staff-level quality monitoring", target:"risk-banded, reviewed in supervision", value:"QRI live", met:true },
+      ]},
+      { title:"Learning, improvement and innovation", quote:"We focus on continuous learning, innovation and improvement across our organisation and the local system.", evidence:[
+        { label:"Actions from incidents & complaints", target:"2 overdue — in progress", value:"56", met:false },
+        { label:"Audit trail of imports, edits and exports", target:"see Admin › Audit log", value:"Complete", met:true },
+      ]},
+    ]);
+    return { safe, wellLed };
+  }
+
+  renderVals() {
+    const p = this.state.page;
+    const cqc = this.cqcGroups();
+    const mainItems = [
+      { key: "overview", label: "Overview" },
+      { key: "risk", label: "Staff Risk Board", alias: ["profile", "pack"] },
+      { key: "cqc", label: "CQC Evidence" },
+      { key: "data", label: "Data Manager" },
+      { key: "admin", label: "Admin" },
+    ];
+    const govItems = [
+      { key: "audit", label: "Audit Log" },
+      { key: "gdpr", label: "GDPR & Governance" },
+    ];
+    const titles = {
+      overview: ["Quality overview", "Incidents, complaints and feedback across all Aldanat services · last 12 months"],
+      risk: ["Staff risk board", "Quality Risk Index per carer, normalised per 100 completed visits · last 12 months"],
+      profile: ["Staff profile", "Supervision view · figures normalised per 100 completed visits"],
+      pack: ["Supervision pack", "Print-ready evidence pack for the staff supervision file"],
+      cqc: ["CQC evidence", "Metrics mapped to the single assessment framework · inspection-ready evidence"],
+      data: ["Data manager", "Import and validate Excel or CSV extracts against the AQI schema"],
+      admin: ["Admin", "QRI configuration, user accounts and the audit trail"],
+      audit: ["Audit log", "Every import, edit, export, sign-in and configuration change"],
+      gdpr: ["GDPR & governance", "How AQI handles personal data — written for managers and inspectors"],
+    };
+
+    const periods = [3, 6, 12].map((m) => ({
+      label: m + "m",
+      go: () => this.setState({ period: m }),
+      style: {
+        borderRadius: "7px", padding: "6px 13px", border: "none", cursor: "pointer",
+        fontFamily: "Inter", fontSize: "13px", fontWeight: 500,
+        background: this.state.period === m ? "#0F5257" : "transparent",
+        color: this.state.period === m ? "#fff" : "#5B7370",
+      },
+    }));
+
+    const kpiCard = (accent) => ({
+      background: "#fff", border: "1px solid #DDE6E3",
+      borderRadius: "13px", padding: "15px 16px 14px",
+      display: "flex", flexDirection: "column", minWidth: 0,
+      boxShadow: "0 1px 2px rgba(18,51,58,0.04)",
+      borderTop: "3px solid " + accent,
+    });
+    const pip = (col) => `width:8px;height:8px;border-radius:50%;background:${col};flex-shrink:0;`;
+    const kpis = [
+      { label: "Incidents", value: "163", sub: "19 CQC notifiable", target: "", accent: "#0F5257", pip: "#0F5257" },
+      { label: "High severity", value: "14", sub: "incidents in period", target: "8.6% of all incidents", accent: "#D9A441", pip: "#D9A441" },
+      { label: "Reported in 24h", value: "95%", sub: "of incidents logged on time", target: "Target 90% · met", accent: "#5F9678", pip: "#5F9678" },
+      { label: "Complaints", value: "55", sub: "received in period", target: "", accent: "#0F5257", pip: "#0F5257" },
+      { label: "Upheld rate", value: "34%", sub: "of decided complaints", target: "Above 25% threshold", accent: "#D9A441", pip: "#D9A441" },
+      { label: "Avg feedback", value: "4.1", sub: "431 responses", target: "Target 4.0 · met", accent: "#5F9678", pip: "#5F9678" },
+      { label: "Missed visits", value: "0.9%", sub: "4.8% late · 23,860 delivered", target: "Target < 1.5% · met", accent: "#5F9678", pip: "#5F9678" },
+    ].map((k) => ({ ...k, card: kpiCard(k.accent), pipStyle: pip(k.pip) }));
+
+    const tag = (bg, col) => `display:inline-flex;flex-shrink:0;align-items:center;padding:2px 9px;border-radius:999px;background:${bg};color:${col};font-size:10.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;margin-top:1px;`;
+    const attention = [
+      { level: "Priority", text: "3 staff sit at Priority attention on the QRI — book supervision this cycle. Concentrated in The Retreat and Peter House.", tag: tag("#F6E1DD", "#96351F") },
+      { level: "Review", text: "Medication errors up 18% on the previous quarter (23 in period). A targeted MAR-recording refresher is recommended.", tag: tag("#F8EDD8", "#8a6113") },
+      { level: "Review", text: "Complaint upheld rate of 34% sits above the 25% internal threshold — review complaint handling in the next governance meeting.", tag: tag("#F8EDD8", "#8a6113") },
+      { level: "Watch", text: "The Retreat missed-session rate (1.6%) is above the 1.5% target, though all other services are within range.", tag: tag("#E7EEEC", "#4a6560") },
+    ];
+
+    const lowThemes = [
+      ["Consistency of staff", 14], ["Communication with family", 11], ["Being listened to", 9],
+      ["Responsiveness", 7], ["Activity choice", 6], ["Dignity and respect", 4], ["Medication support", 3],
+    ].map(([label, count]) => ({
+      label, count,
+      bar: `display:block;height:100%;width:${(count / 14) * 100}%;background:#BF4A36;opacity:.72;border-radius:5px;`,
+    }));
+
+    // ---- risk board view models ----
+    const allStaff = this.staffData();
+    const bandCount = (b) => allStaff.filter((s) => s.band === b).length;
+    const chipDefs = [
+      { key:"All", label:"All", n:allStaff.length },
+      { key:"Priority", label:"Priority attention", n:bandCount("Priority") },
+      { key:"Review", label:"Review", n:bandCount("Review") },
+      { key:"Stable", label:"Within range", n:bandCount("Stable") },
+      { key:"NotRated", label:"Not rated", n:bandCount("NotRated") },
+    ];
+    const bandChips = chipDefs.map((c) => {
+      const active = this.state.band === c.key;
+      return { label:c.label, n:c.n,
+        go: () => this.setState({ band: c.key }),
+        style: { display:"inline-flex", alignItems:"center", gap:"7px", padding:"6px 13px", borderRadius:"999px",
+          border:"1px solid "+(active?"#0F5257":"#DDE6E3"), background:active?"#0F5257":"#fff",
+          color:active?"#fff":"#3d5450", fontFamily:"Inter", fontSize:"12.5px", fontWeight:500, cursor:"pointer" },
+        countStyle: { fontVariantNumeric:"tabular-nums", fontWeight:600, opacity:active?0.85:0.55, fontSize:"11.5px" } };
+    });
+    const rankOrder = { Priority:0, Review:1, Stable:2, NotRated:3 };
+    const filteredStaff = allStaff
+      .filter((s) => this.state.band === "All" ? true : s.band === this.state.band)
+      .sort((a,b) => rankOrder[a.band]-rankOrder[b.band] || b.qri-a.qri)
+      .map((s) => {
+        const m = this.bandMeta(s.band);
+        const notRated = s.band === "NotRated";
+        return {
+          name:s.name, roleTeam:s.role+" · "+s.team,
+          qri: notRated ? String(s.qri) : String(s.qri),
+          qriMuted: notRated,
+          badgeLabel:m.label, strong:s.strong, small:s.small,
+          inc:String(s.inc), rate: s.rate==="—" ? "—" : s.rate+"/100",
+          upheld: s.cTot===0 ? "0" : s.cUp+" of "+s.cTot, fb:s.fb, fbN:"("+s.fbN+")",
+          go: () => this.go("profile"),
+          cardStyle:{ display:"block", width:"100%", textAlign:"left", cursor:"pointer",
+            background:"#fff", border:"1px solid #DDE6E3", borderLeft:"4px solid "+m.edge,
+            borderRadius:"13px", padding:"15px 16px", boxShadow:"0 1px 2px rgba(18,51,58,0.04)" },
+          badgeStyle:{ display:"inline-flex", alignItems:"center", padding:"3px 10px", borderRadius:"999px",
+            background:m.badgeBg, color:m.badgeCol, fontSize:"11px", fontWeight:600, letterSpacing:".1px" },
+          qriStyle:{ fontFamily:"Sora", fontSize:"26px", fontWeight:700, fontVariantNumeric:"tabular-nums",
+            lineHeight:1, color: notRated ? "#9fb0ab" : "#12333A" },
+        };
+      });
+
+    return {
+      bandChips,
+      filteredStaff,
+      qriRows: this.qriRows(),
+      profileEvents: this.profileEvents(),
+      profileActions: this.profileActions(),
+      profileFeedbackChart: this.profileFeedbackChart(),
+      profileKpis: [
+        { label:"Incidents", raw:"15", rate:"1.7 per 100 visits", extra:"3 high · 5 moderate · 7 low" },
+        { label:"Complaints", raw:"4", rate:"0.5 per 100 visits", extra:"3 upheld / partially upheld" },
+        { label:"Feedback", raw:"3.0/5", rate:"26 responses", extra:"9 low scores (1–2)" },
+        { label:"Support sessions", raw:"862", rate:"3.2% late · 1.1% missed", extra:"902 scheduled in period" },
+      ],
+      profileVisits: [["Jul",74],["Aug",79],["Sep",72],["Oct",81],["Nov",76],["Dec",68],["Jan",75],["Feb",80],["Mar",73],["Apr",77],["May",71],["Jun",66]].map(([m,n])=>m+": "+n),
+      goPack: () => this.go("pack"),
+      goRisk: () => this.go("risk"),
+      goProfile: () => this.go("profile"),
+      printPack: () => window.print(),
+      packEvents: [
+        { date:"12 Jun 2026", type:"Incident", detail:"Behaviour that challenges — High (CQC notifiable)", person:"RT-03", status:"Under review" },
+        { date:"28 May 2026", type:"Low feedback", detail:"Score 2/5 — Consistency of staff (Easy-read survey)", person:"RT-01", status:"—" },
+        { date:"15 May 2026", type:"Incident", detail:"Medication error — Moderate", person:"RT-05", status:"Closed" },
+        { date:"30 Apr 2026", type:"Complaint", detail:"Staff conduct (Family / relative)", person:"RT-03", status:"Partially upheld" },
+        { date:"08 Apr 2026", type:"Incident", detail:"Physical intervention used — High (reported late)", person:"RT-02", status:"Closed" },
+        { date:"22 Mar 2026", type:"Incident", detail:"Fall — Moderate", person:"RT-06", status:"Closed" },
+        { date:"05 Mar 2026", type:"Low feedback", detail:"Score 2/5 — Being listened to (Keyworker session)", person:"RT-04", status:"—" },
+        { date:"02 Feb 2026", type:"Complaint", detail:"Communication with family (Advocate)", person:"RT-01", status:"Upheld" },
+        { date:"14 Jan 2026", type:"Incident", detail:"Medication error — High (CQC notifiable)", person:"RT-05", status:"Closed" },
+      ],
+      packThemes: [
+        { theme:"Consistency of staff", meta:"6× · avg score 2.4", low:true },
+        { theme:"Being listened to", meta:"4× · avg score 2.6", low:true },
+        { theme:"Communication with family", meta:"3× · avg score 2.8", low:true },
+        { theme:"Kind and caring staff", meta:"5× · avg score 4.2", low:false },
+        { theme:"Supports my independence", meta:"4× · avg score 4.0", low:false },
+        { theme:"Knows me well", meta:"4× · avg score 4.1", low:false },
+      ].map((t)=>({ ...t, boxStyle:`border:1px solid ${t.low?"#E6C4BC":"#C4DBCB"};background:${t.low?"#FBEEEB":"#EEF5F0"};border-radius:9px;padding:9px 11px;` })),
+      packActions: [
+        { created:"12 May 2026", source:"Supervision", action:"Refresher training: medication administration and MAR recording", owner:"Priya Nair", due:"09 Jun 2026", status:"Overdue" },
+        { created:"20 Jun 2026", source:"Supervision", action:"Review communication passports for allocated keywork clients", owner:"Priya Nair", due:"18 Jul 2026", status:"In progress" },
+        { created:"09 Apr 2026", source:"Incident review", action:"Shadow shifts with senior support worker to embed PBS strategies", owner:"Priya Nair", due:"21 May 2026", status:"Completed" },
+        { created:"15 Mar 2026", source:"Supervision", action:"Complete safeguarding adults level 2 refresher", owner:"Registered Manager", due:"30 Apr 2026", status:"Completed" },
+        { created:"02 Feb 2026", source:"Complaint outcome", action:"Written reflection on dignity in personal care", owner:"Priya Nair", due:"16 Feb 2026", status:"Completed" },
+      ].map((a)=>({ ...a, overdue:a.status==="Overdue" })),
+      packBlankRows: [1,2,3,4,5],
+      cqcSafe: cqc.safe,
+      notifHeads: ["Date","Ref","Category","Severity","Service","Person","Notified in 24h","Status"],
+      cqcWellLed: cqc.wellLed,
+      exportPack: () => window.print(),
+      cqcNotifiable: [
+        { date:"12 Jun 2026", ref:"INC0148", cat:"Behaviour that challenges", sev:"High", svc:"The Retreat", person:"RT-03", in24:"Yes", ok:true, status:"Under review" },
+        { date:"02 Jun 2026", ref:"INC0142", cat:"Safeguarding concern", sev:"High", svc:"Peter House", person:"PH-04", in24:"Yes", ok:true, status:"Open" },
+        { date:"21 May 2026", ref:"INC0131", cat:"Missing person", sev:"Moderate", svc:"Community Outreach", person:"CO-02", in24:"Yes", ok:true, status:"Closed · 28 May" },
+        { date:"14 Apr 2026", ref:"INC0108", cat:"Medication error", sev:"High", svc:"The Retreat", person:"RT-05", in24:"No", ok:false, status:"Closed · 26 Apr" },
+        { date:"30 Mar 2026", ref:"INC0096", cat:"Physical intervention used", sev:"High", svc:"Senna House", person:"SH-03", in24:"Yes", ok:true, status:"Closed · 07 Apr" },
+        { date:"18 Feb 2026", ref:"INC0074", cat:"Self-harm", sev:"High", svc:"Peter House", person:"PH-07", in24:"Yes", ok:true, status:"Closed · 24 Feb" },
+        { date:"09 Jan 2026", ref:"INC0051", cat:"Health emergency", sev:"High", svc:"The Retreat", person:"RT-02", in24:"Yes", ok:true, status:"Closed · 15 Jan" },
+        { date:"22 Nov 2025", ref:"INC0032", cat:"Safeguarding concern", sev:"Moderate", svc:"Senna House", person:"SH-01", in24:"Yes", ok:true, status:"Closed · 03 Dec" },
+        { date:"14 Oct 2025", ref:"INC0019", cat:"Missing person", sev:"Moderate", svc:"Community Outreach", person:"CO-05", in24:"Yes", ok:true, status:"Closed · 19 Oct" },
+      ].map((n)=>({ ...n, in24Style:`font-weight:600;color:${n.ok?"#3d6b52":"#96351F"};` })),
+      packSummary: [
+        { label:"Support sessions", value:"862", sub:"3.2% late · 1.1% missed" },
+        { label:"Incidents", value:"15 (1.7/100)", sub:"3 high severity · 3 notifiable" },
+        { label:"Complaints", value:"4", sub:"3 upheld / partially upheld" },
+        { label:"Feedback average", value:"3.0/5", sub:"26 responses · 9 low (1–2)" },
+      ],
+      nav: this.makeNav(mainItems),
+      navGov: this.makeNav(govItems),
+      navAll: this.makeNav([...mainItems, ...govItems]),
+      navOpen: this.state.navOpen,
+      toggleNav: () => this.setState((s) => ({ navOpen: !s.navOpen })),
+      periods,
+      pageTitle: (titles[p] || titles.overview)[0],
+      pageSub: (titles[p] || titles.overview)[1],
+      isOverview: p === "overview",
+      isRisk: p === "risk",
+      isProfile: p === "profile",
+      isPack: p === "pack",
+      isCqc: p === "cqc",
+      isStub: ["data", "admin", "audit", "gdpr"].includes(p),
+      kpis,
+      attention,
+      lowThemes,
+      attnCard: { background: "#fff", border: "1px solid #DDE6E3", borderRadius: "14px", padding: "16px 18px", boxShadow: "0 1px 2px rgba(18,51,58,0.04)", display: "flex", flexDirection: "column" },
+      chartCard: { background: "#fff", border: "1px solid #DDE6E3", borderRadius: "14px", padding: "16px 18px", boxShadow: "0 1px 2px rgba(18,51,58,0.04)" },
+      trendChart: this.trendChart(),
+      feedbackChart: this.feedbackChart(),
+      categoryChart: this.categoryChart(),
+      sourceChart: this.sourceChart(),
+    };
+  }
+}
+</script>
+</body>
+</html>

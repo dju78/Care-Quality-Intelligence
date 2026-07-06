@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { dateLabel, useApi } from "../api";
-import { FilterBar } from "../components/Layout";
-import { Card, EmptyState, ErrorNote, ProgressBar, SectionHeading, Spinner } from "../components/ui";
+import { Card, EmptyState, ErrorNote, ProgressBar, SectionDivider, SectionHeading, Spinner } from "../components/ui";
 import { useFilters, useMeta } from "../store";
 import type { CqcData } from "../types";
 
@@ -70,20 +69,26 @@ export default function Cqc() {
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl font-semibold text-ink">CQC evidence mode</h1>
-          <p className="text-sm text-ink/60">Metrics mapped to the single assessment framework · Safe and Well-led</p>
+      {/* inspection-ready banner (carries the export action) */}
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-[#BBD4D3] bg-petroltint px-4 py-4">
+        <div className="flex gap-3">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-petrol text-white">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2l7 4v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-4z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" /><path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          </span>
+          <div>
+            <p className="text-[13.5px] font-semibold text-petrol-700">Inspection-ready evidence</p>
+            <p className="mt-0.5 max-w-2xl text-[12.5px] leading-snug text-[#2f4f4c]">
+              AQI metrics are mapped to the CQC single assessment framework quality statements for <strong className="font-semibold">Safe</strong> and <strong className="font-semibold">Well-led</strong>. Every figure is drawn from source records and is exportable as a dated evidence pack.
+            </p>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <FilterBar />
-          <Link
-            to={`/cqc/export?months=${months}&team=${encodeURIComponent(team)}`}
-            className="rounded-lg bg-petrol px-4 py-2 text-sm font-semibold text-white hover:bg-petrol-700"
-          >
-            Export evidence pack (PDF)
-          </Link>
-        </div>
+        <Link
+          to={`/cqc/export?months=${months}&team=${encodeURIComponent(team)}`}
+          className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-petrol px-[18px] py-[11px] text-[13.5px] font-semibold text-white hover:bg-petrol-700"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          Export evidence pack
+        </Link>
       </div>
 
       {error && <ErrorNote message={error} />}
@@ -93,8 +98,8 @@ export default function Cqc() {
         <>
           {qualityStatements(data, meta.targets).map((kq) => (
             <section key={kq.key}>
-              <h2 className="font-display text-lg font-semibold text-petrol">{kq.key}</h2>
-              <div className="mt-2 grid gap-4 xl:grid-cols-3">
+              <SectionDivider title={kq.key} />
+              <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">
                 {kq.statements.map((st) => (
                   <Card key={st.title} className="p-4">
                     <h3 className="font-display font-semibold text-ink">{st.title}</h3>
