@@ -123,6 +123,14 @@ const STAFF: StaffSeed[] = [];
 }
 
 // ---------- clients (people we support) ----------
+// Realistic mix of adult social care service types, lightly weighted by service.
+// All synthetic — no real people, service users or addresses.
+const PACKAGE_MIX: Record<string, [string, number][]> = {
+  "The Retreat": [["Residential Care", 0.55], ["Complex Support", 0.25], ["Supported Living", 0.2]],
+  "Peter House": [["Residential Care", 0.4], ["Supported Living", 0.4], ["Complex Support", 0.2]],
+  "Senna House": [["Supported Living", 0.5], ["Day Support", 0.25], ["Complex Support", 0.25]],
+  "Community Outreach": [["Community Outreach", 0.45], ["Day Support", 0.3], ["Supported Living", 0.25]],
+};
 interface ClientSeed { id: string; ref: string; pkg: string; area: string; funding: string; team: string }
 const CLIENTS: ClientSeed[] = [];
 {
@@ -139,7 +147,7 @@ const CLIENTS: ClientSeed[] = [];
       CLIENTS.push({
         id: `C${pad(n, 3)}`,
         ref: `${prefix}-${pad(i, 2)}`,
-        pkg: team === "Peter House" && i > 7 ? "Supported Living" : svc.package,
+        pkg: weighted(PACKAGE_MIX[team]),
         area: svc.area,
         funding: weighted([
           ["Local Authority", 0.55],
