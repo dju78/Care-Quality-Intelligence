@@ -1,6 +1,6 @@
 /**
  * Seed script: 12 months (July 2025 - June 2026) of synthetic quality data for
- * Aldanat Care's four services. Deterministic (seeded RNG) so re-seeding
+ * the provider's four services. Deterministic (seeded RNG) so re-seeding
  * reproduces the same dataset. Run with `npm run seed` (forces a re-seed).
  */
 import { db, initSchema, ensureDefaultConfig, audit } from "./db.js";

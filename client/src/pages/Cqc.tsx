@@ -4,7 +4,7 @@ import { Card, EmptyState, ErrorNote, ProgressBar, SectionDivider, SectionHeadin
 import { useFilters, useMeta } from "../store";
 import type { CqcData } from "../types";
 
-/** Maps AQI metrics to CQC single assessment framework quality statements. */
+/** Maps CQI metrics to CQC single assessment framework quality statements. */
 export function qualityStatements(d: CqcData, targets: { reportedWithin24hPct: number; avgFeedback: number; resolvedWithin28dPct: number }) {
   return [
     {
@@ -15,7 +15,7 @@ export function qualityStatements(d: CqcData, targets: { reportedWithin24hPct: n
           statement: "We have a proactive and positive culture of safety based on openness and honesty, in which concerns about safety are listened to, safety events are investigated and reported thoroughly, and lessons are learned to continually identify and embed good practices.",
           evidence: [
             { label: "Incidents reported within 24 hours", value: d.kpis.reported24hPct !== null ? `${d.kpis.reported24hPct}%` : "—", target: `target ${targets.reportedWithin24hPct}%`, met: d.kpis.reported24hPct !== null && d.kpis.reported24hPct >= targets.reportedWithin24hPct },
-            { label: "Incidents logged in period", value: String(d.kpis.incidents), target: "all staff report through AQI", met: true },
+            { label: "Incidents logged in period", value: String(d.kpis.incidents), target: "all staff report through CQI", met: true },
             { label: "Learning actions completed", value: d.learning.completedPct !== null ? `${d.learning.completedPct}%` : "—", target: `${d.learning.completed} of ${d.learning.totalActions} actions`, met: d.learning.completedPct !== null && d.learning.completedPct >= 75 },
           ],
         },
@@ -78,7 +78,7 @@ export default function Cqc() {
           <div>
             <p className="text-[13.5px] font-semibold text-petrol-700">Inspection-ready evidence</p>
             <p className="mt-0.5 max-w-2xl text-[12.5px] leading-snug text-[#2f4f4c]">
-              AQI metrics are mapped to the CQC single assessment framework quality statements for <strong className="font-semibold">Safe</strong> and <strong className="font-semibold">Well-led</strong>. Every figure is drawn from source records and is exportable as a dated evidence pack.
+              CQI metrics are mapped to the CQC single assessment framework quality statements for <strong className="font-semibold">Safe</strong> and <strong className="font-semibold">Well-led</strong>. Every figure is drawn from source records and is exportable as a dated evidence pack.
             </p>
           </div>
         </div>

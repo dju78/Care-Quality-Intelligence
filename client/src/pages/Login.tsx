@@ -31,9 +31,9 @@ export default function Login() {
     <div className="flex min-h-screen items-center justify-center bg-mist px-4">
       <div className="w-full max-w-md">
         <div className="mb-6 text-center">
-          <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-petrol font-display text-lg font-bold text-white">AQ</span>
-          <h1 className="mt-3 font-display text-2xl font-semibold text-ink">Aldanat Quality Intelligence</h1>
-          <p className="mt-1 text-sm text-ink/60">Quality monitoring and supervision evidence for Aldanat Care services</p>
+          <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-petrol font-display text-lg font-bold text-white">CQ</span>
+          <h1 className="mt-3 font-display text-2xl font-semibold text-ink">Care Quality Intelligence</h1>
+          <p className="mt-1 text-sm text-ink/60">Quality monitoring and supervision evidence for your care services</p>
         </div>
         <form onSubmit={submit} className="rounded-2xl border border-petrol-100 bg-white p-6 shadow-card">
           <label htmlFor="username" className="block text-sm font-medium text-ink">Username</label>

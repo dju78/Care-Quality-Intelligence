@@ -17,7 +17,7 @@ export const useAuth = create<AuthState>()(
       setAuth: (token, user) => set({ token, user }),
       clearAuth: () => set({ token: null, user: null }),
     }),
-    { name: "aqi-auth" }
+    { name: "cqi-auth" }
   )
 );
 
@@ -37,7 +37,7 @@ export const useFilters = create<FilterState>()(
       setTeam: (team) => set({ team }),
       setMonths: (months) => set({ months }),
     }),
-    { name: "aqi-filters" }
+    { name: "cqi-filters" }
   )
 );
 

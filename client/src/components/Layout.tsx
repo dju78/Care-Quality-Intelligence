@@ -16,25 +16,25 @@ const NAV_GOV = [{ to: "/gdpr", label: "Data protection", roles: ["Director", "R
 
 /** Page title/subtitle + whether the global filters apply, keyed by route. */
 function pageMeta(pathname: string, team: string): { title: string; sub: string; filters: boolean } {
-  const scope = team === "All" ? "all Aldanat services" : team;
+  const scope = team === "All" ? "all services" : team;
   if (pathname === "/") return { title: "Quality overview", sub: `Incidents, complaints and feedback across ${scope}`, filters: true };
   if (pathname === "/risk") return { title: "Staff risk board", sub: "Quality Risk Index per carer, normalised per 100 completed support sessions", filters: true };
   if (pathname.startsWith("/staff/")) return { title: "Staff profile", sub: "Supervision view · figures normalised per 100 completed sessions", filters: true };
   if (pathname === "/cqc") return { title: "CQC evidence", sub: "Metrics mapped to the single assessment framework · inspection-ready evidence", filters: true };
-  if (pathname === "/data") return { title: "Data manager", sub: "Import and validate Excel or CSV extracts against the AQI schema", filters: false };
+  if (pathname === "/data") return { title: "Data manager", sub: "Import and validate Excel or CSV extracts against the CQI schema", filters: false };
   if (pathname === "/admin") return { title: "Admin", sub: "QRI configuration, user accounts and the audit trail", filters: false };
-  if (pathname === "/gdpr") return { title: "Data protection & governance", sub: "How AQI handles personal data — written for managers and inspectors", filters: false };
-  return { title: "Aldanat Quality Intelligence", sub: "", filters: false };
+  if (pathname === "/gdpr") return { title: "Data protection & governance", sub: "How CQI handles personal data — written for managers and inspectors", filters: false };
+  return { title: "Care Quality Intelligence", sub: "", filters: false };
 }
 
 function Logo() {
   return (
     <div className="flex items-center gap-3 px-1">
       <span className="flex h-[38px] w-[38px] items-center justify-center rounded-[11px] bg-petrol font-display text-sm font-bold tracking-wide text-white" aria-hidden="true">
-        AQ
+        CQ
       </span>
       <span className="leading-tight">
-        <span className="block font-display text-[15px] font-semibold text-ink">Aldanat Quality</span>
+        <span className="block font-display text-[15px] font-semibold text-ink">Care Quality</span>
         <span className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-petrol">Intelligence</span>
       </span>
     </div>
@@ -137,7 +137,7 @@ export default function Layout() {
   const { title, sub, filters } = pageMeta(location.pathname, team);
 
   return (
-    <div className="aqi-scroll min-h-screen bg-mist lg:flex">
+    <div className="cqi-scroll min-h-screen bg-mist lg:flex">
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2">
         Skip to main content
       </a>
@@ -213,7 +213,7 @@ export default function Layout() {
           <Outlet />
         </main>
         <footer className="mx-auto max-w-[1240px] px-4 pb-7 text-[11.5px] text-faint lg:px-8">
-          Aldanat Quality Intelligence · People we support are shown by ClientRef only · Quality data supports supervision conversations, it is not an automated judgement.
+          Care Quality Intelligence · People we support are shown by ClientRef only · Quality data supports supervision conversations, it is not an automated judgement.
         </footer>
       </div>
     </div>

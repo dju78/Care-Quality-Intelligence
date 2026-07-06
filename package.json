@@ -1,9 +1,9 @@
 {
-  "name": "aldanat-quality-intelligence",
+  "name": "care-quality-intelligence",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Aldanat Quality Intelligence (AQI) — staff quality performance platform for Aldanat Care (residential, supported living and outreach services for adults with learning disabilities).",
+  "description": "Care Quality Intelligence (CQI) — staff quality performance platform for care providers (residential, supported living and outreach services for adults with learning disabilities).",
   "workspaces": [
     "server",
     "client"

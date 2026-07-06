@@ -17,7 +17,7 @@ export default {
         amber: { DEFAULT: "#D9A441", 100: "#F8EDD8", 700: "#8a6113" },
         rust: { DEFAULT: "#BF4A36", 100: "#F6E1DD", 700: "#96351F" },
         mist: "#F3F6F5",
-        // design-system neutrals (from the AQI design system)
+        // design-system neutrals (from the CQI design system)
         line: "#DDE6E3",
         muted: "#5B7370",
         faint: "#8AA09B",

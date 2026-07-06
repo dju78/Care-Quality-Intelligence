@@ -4,9 +4,9 @@ const SECTIONS = [
   {
     title: "What this system holds, and what it deliberately does not",
     body: [
-      "Aldanat Quality Intelligence (AQI) processes quality and safety data about our services: incidents, complaints, feedback, support sessions and supervision actions. It links these to staff members so that patterns can be discussed in supervision.",
+      "Care Quality Intelligence (CQI) processes quality and safety data about our services: incidents, complaints, feedback, support sessions and supervision actions. It links these to staff members so that patterns can be discussed in supervision.",
       "People we support are never identified by name. Every record uses a reference code (for example RT-03), and the interface, supervision packs and CQC exports show only that code. The key linking codes to people is held separately in the care planning system, on a need-to-know basis.",
-      "AQI does not hold care plans, health records, photographs, or any special category data about the people we support beyond the fact that a quality event occurred.",
+      "CQI does not hold care plans, health records, photographs, or any special category data about the people we support beyond the fact that a quality event occurred.",
     ],
   },
   {
@@ -27,7 +27,7 @@ const SECTIONS = [
   {
     title: "Retention",
     body: [
-      "Quality event data (incidents, complaints, feedback) is retained for 3 years from the end of the year it relates to, in line with CQC evidential expectations, then deleted from AQI.",
+      "Quality event data (incidents, complaints, feedback) is retained for 3 years from the end of the year it relates to, in line with CQC evidential expectations, then deleted from CQI.",
       "Supervision packs and agreed actions are retained in the staff member's supervision file for the duration of employment plus 6 years.",
       "The audit log (who imported, changed or exported what, and when) is retained for 6 years.",
       "Rolled-back imports are physically deleted immediately; the audit log keeps only the fact that the import and rollback happened.",
@@ -45,7 +45,7 @@ const SECTIONS = [
     title: "Individual rights",
     body: [
       "Staff may request a copy of the data held about them (subject access), and corrections of factual errors, via the Registered Manager. Because metrics are calculated from source records, correcting a source record automatically corrects the metrics.",
-      "People we support (or their representatives) exercising their rights should contact the Registered Manager; the reference-code design means AQI itself rarely holds their personal data.",
+      "People we support (or their representatives) exercising their rights should contact the Registered Manager; the reference-code design means CQI itself rarely holds their personal data.",
       "Concerns about how data is used can be raised with the Registered Manager, our Data Protection Lead, or the ICO (ico.org.uk).",
     ],
   },

@@ -233,7 +233,7 @@ importRouter.get("/template/:table", (req, res) => {
   };
   const csv = spec.columns.map((c) => c.name).join(",") + "\r\n" + example[req.params.table] + "\r\n";
   res.setHeader("Content-Type", "text/csv");
-  res.setHeader("Content-Disposition", `attachment; filename="aqi_${req.params.table}_template.csv"`);
+  res.setHeader("Content-Disposition", `attachment; filename="cqi_${req.params.table}_template.csv"`);
   res.send(csv);
 });
 

@@ -41,7 +41,7 @@ export default function SupervisionPack() {
         {/* header */}
         <header className="flex items-start justify-between border-b-4 border-petrol pb-4">
           <div>
-            <p className="font-display text-xs font-semibold uppercase tracking-widest text-petrol">Aldanat Care · Confidential</p>
+            <p className="font-display text-xs font-semibold uppercase tracking-widest text-petrol">Care Quality Intelligence · Confidential</p>
             <h1 className="mt-1 font-display text-2xl font-bold text-ink">Supervision pack: {data.staff.StaffName}</h1>
             <p className="mt-1 text-sm text-ink/70">
               {data.staff.Role} · {data.staff.Team} · Staff ID {data.staff.StaffID} · started {fmt(data.staff.StartDate)}
@@ -215,7 +215,7 @@ export default function SupervisionPack() {
         </section>
 
         <footer className="mt-8 border-t border-ink/15 pt-3 text-[10px] text-ink/50">
-          Aldanat Quality Intelligence · Confidential HR record - store in the staff member's supervision file ·
+          Care Quality Intelligence · Confidential HR record - store in the staff member's supervision file ·
           Data minimised: no names of people we support appear in this document.
         </footer>
       </article>

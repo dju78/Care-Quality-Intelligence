@@ -39,7 +39,7 @@ export default function DataManager() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `aqi_${t}_template.csv`;
+    a.download = `cqi_${t}_template.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };

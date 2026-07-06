@@ -1,10 +1,10 @@
-# Aldanat Quality Intelligence (AQI)
+# Care Quality Intelligence (CQI)
 
-A staff quality performance platform for **Aldanat Care** — a residential care, supported living and community
-outreach provider for adults with learning disabilities in Essex (The Retreat, Peter House, Senna House, and
-Community Outreach from the Weeley hub).
+A staff quality performance platform for care providers — designed around residential care, supported living and
+community outreach services for adults with learning disabilities (the sample data models four services: The
+Retreat, Peter House, Senna House, and Community Outreach).
 
-AQI monitors incidents, complaints and feedback at organisation, service and individual staff level, and turns
+CQI monitors incidents, complaints and feedback at organisation, service and individual staff level, and turns
 that monitoring into **supervision packs** and **CQC inspection evidence**. It is built to be fair by design:
 every staff-level metric is normalised per 100 delivered support sessions, small samples suppress judgement,
 and conscientious reporters are flagged as a strength rather than a risk.
@@ -21,7 +21,7 @@ npm run dev
 - Web app: http://localhost:5173
 - API: http://localhost:4001
 
-On first run the server creates `server/data/aqi.db` and seeds **12 months of synthetic data**
+On first run the server creates `server/data/cqi.db` and seeds **12 months of synthetic data**
 (July 2025 – June 2026): 28 staff across four services, 34 people supported, ~24,000 support sessions,
 ~160 incidents, 55 complaints and ~420 feedback records. Re-seed at any time with `npm run seed`
 (deterministic — the same data is regenerated).
@@ -115,7 +115,7 @@ export pixel-identical to what's reviewed on screen and requires no native PDF d
 1. `npm install && npm run build`
 2. `npm start` (set `PORT` if needed; default 4001). The Express server serves the built client and the API
    from one process — put it behind HTTPS (e.g. Caddy/nginx or an internal IIS reverse proxy).
-3. The SQLite database lives at `server/data/aqi.db`; back it up on your normal schedule. WAL mode is enabled.
+3. The SQLite database lives at `server/data/cqi.db`; back it up on your normal schedule. WAL mode is enabled.
 4. Before go-live: change the demo passwords, create real accounts, and import real extracts through the
    Data manager (which validates before committing and is fully audited).
 

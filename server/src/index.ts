@@ -20,7 +20,7 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "2mb" }));
 
-app.get("/api/health", (_req, res) => res.json({ ok: true, service: "Aldanat Quality Intelligence API" }));
+app.get("/api/health", (_req, res) => res.json({ ok: true, service: "Care Quality Intelligence API" }));
 app.use("/api", router);
 app.use("/api/admin", adminRouter);
 app.use("/api/import", importRouter);
@@ -38,5 +38,5 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
 });
 
 app.listen(PORT, () => {
-  console.log(`AQI API listening on http://localhost:${PORT}`);
+  console.log(`CQI API listening on http://localhost:${PORT}`);
 });
