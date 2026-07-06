@@ -55,10 +55,11 @@ export default function RiskBoard() {
       <Note title="How to read this board">
         The Quality Risk Index prioritises who to have a supervision conversation with first — it is <em>not</em> an
         automated performance judgement. Rates are normalised per 100 completed sessions so busier staff are not
-        penalised, conscientious frequent reporters with strong feedback are flagged as a{" "}
-        <StrongReporterBadge className="mx-0.5 align-middle" /> rather than a risk, and RAG colouring is withheld where
-        the sample is too small to be fair
+        penalised, and conscientious frequent reporters with strong feedback are flagged as a{" "}
+        <StrongReporterBadge className="mx-0.5 align-middle" /> rather than a risk. Banding is withheld where the sample
+        is too small
         {meta ? ` (fewer than ${meta.smallSample.minVisits} completed sessions or ${meta.smallSample.minFeedback} feedback responses)` : ""}.
+        Review the available evidence with caution and avoid drawing performance conclusions from limited data.
       </Note>
 
       <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Filter by band">
