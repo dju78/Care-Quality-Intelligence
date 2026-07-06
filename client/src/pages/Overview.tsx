@@ -213,8 +213,8 @@ export default function Overview() {
           {/* Secondary service context — care package mix. Not part of any risk measure. */}
           <Card className="p-4">
             <SectionHeading
-              title="Care package mix"
-              sub="Service context by share of delivered support · not a performance measure"
+              title="Service mix context"
+              sub="Share of delivered support by care package type. Context only — not a performance measure."
             />
             <div className="grid gap-x-8 gap-y-2 md:grid-cols-2">
               <CarePackageBars rows={data.carePackageMix} metric="sessions" />
