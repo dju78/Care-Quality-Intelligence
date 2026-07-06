@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { api, dateLabel, useApi } from "../api";
+import { api, apiUrl, dateLabel, useApi } from "../api";
 import { Card, EmptyState, SectionHeading, Spinner } from "../components/ui";
 import { useAuth } from "../store";
 import type { ImportValidation } from "../types";
@@ -45,7 +45,7 @@ export default function DataManager() {
   };
 
   const downloadTemplate = async (t: string) => {
-    const res = await fetch(`/api/import/template/${t}`, { headers: { Authorization: `Bearer ${token}` } });
+    const res = await fetch(apiUrl(`/api/import/template/${t}`), { headers: { Authorization: `Bearer ${token}` } });
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

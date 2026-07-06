@@ -118,10 +118,17 @@ export pixel-identical to what's reviewed on screen and requires no native PDF d
 
 ## Deployment
 
+**Cloud (Vercel / Render):** see **[DEPLOY.md](DEPLOY.md)** for two ready-to-go paths — an all-in-one Vercel
+demo (one import; `vercel.json` + `api/` are included) or a durable static-client-on-Vercel + API-on-Render
+setup (`render.yaml` included). Set `VITE_API_BASE` on the client only when the API is on a separate origin.
+
+**Self-hosted (single Node process):**
+
 1. `npm install && npm run build`
 2. `npm start` (set `PORT` if needed; default 4001). The Express server serves the built client and the API
    from one process — put it behind HTTPS (e.g. Caddy/nginx or an internal IIS reverse proxy).
-3. The SQLite database lives at `server/data/cqi.db`; back it up on your normal schedule. WAL mode is enabled.
+3. The SQLite database lives at `server/data/cqi.db` (override with `DATA_DIR`); back it up on your normal
+   schedule. WAL mode is enabled.
 4. Before go-live: change the demo passwords, create real accounts, and import real extracts through the
    Data manager (which validates before committing and is fully audited).
 

@@ -37,6 +37,12 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
   res.status(500).json({ error: "Unexpected server error" });
 });
 
-app.listen(PORT, () => {
-  console.log(`CQI API listening on http://localhost:${PORT}`);
-});
+// On Vercel (serverless) the app is exported and invoked per-request; only
+// bind a port when running as a normal long-lived process (local / Render).
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`CQI API listening on http://localhost:${PORT}`);
+  });
+}
+
+export default app;

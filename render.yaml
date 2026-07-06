@@ -1,0 +1,22 @@
+# Fallback / production-grade API host (persistent Node process, native modules
+# work out of the box). Pair with the static client on Vercel by setting the
+# client env var VITE_API_BASE to this service's URL.
+services:
+  - type: web
+    name: cqi-api
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build --workspace server
+    startCommand: npm run start --workspace server
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+    # For data that survives restarts, attach a disk and point DATA_DIR at it:
+    # envVars:
+    #   - key: DATA_DIR
+    #     value: /var/data
+    # disk:
+    #   name: cqi-data
+    #   mountPath: /var/data
+    #   sizeGB: 1

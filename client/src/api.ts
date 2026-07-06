@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "./store";
 
+// Same-origin by default (all-in-one deploy / Vite dev proxy). Set VITE_API_BASE
+// to an absolute origin (e.g. https://cqi-api.onrender.com) when the API is
+// hosted separately from the static client.
+const API_BASE = (import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
+export const apiUrl = (path: string) => (path.startsWith("/api") ? API_BASE + path : path);
+
 export class ApiError extends Error {
   status: number;
   constructor(status: number, message: string) {
@@ -14,7 +20,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const headers = new Headers(options.headers);
   if (token) headers.set("Authorization", `Bearer ${token}`);
   if (options.body && !(options.body instanceof FormData)) headers.set("Content-Type", "application/json");
-  const res = await fetch(path, { ...options, headers });
+  const res = await fetch(apiUrl(path), { ...options, headers });
   if (res.status === 401) {
     clearAuth();
     throw new ApiError(401, "Your session has expired. Please sign in again.");

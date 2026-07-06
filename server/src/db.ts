@@ -4,7 +4,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-export const DATA_DIR = path.join(__dirname, "..", "data");
+// Resolution order: explicit DATA_DIR (e.g. a mounted persistent disk) →
+// /tmp on Vercel (its filesystem is read-only except the ephemeral /tmp) →
+// server/data locally and on hosts with a normal writable disk.
+export const DATA_DIR = process.env.DATA_DIR ?? (process.env.VERCEL ? "/tmp" : path.join(__dirname, "..", "data"));
 export const DB_PATH = path.join(DATA_DIR, "cqi.db");
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
