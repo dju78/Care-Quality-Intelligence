@@ -42,6 +42,7 @@ export interface OverviewData {
   byCategory: { Category: string; Low: number; Moderate: number; High: number; total: number }[];
   bySource: { Source: string; count: number }[];
   lowThemes: { Theme: string; count: number }[];
+  carePackageMix: { name: string; clients: number; sessions: number }[];
 }
 
 export interface StaffMetrics {
@@ -100,6 +101,7 @@ export interface StaffProfile {
   events: TimelineEvent[];
   feedbackThemes: { Theme: string; count: number; avgScore: number; hasLow: number }[];
   actions: ActionRow[];
+  carePackageContext: { name: string; clients: number; sessions: number }[];
   generatedBy?: string;
   generatedAt?: string;
 }

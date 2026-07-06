@@ -23,8 +23,14 @@ npm run dev
 
 On first run the server creates `server/data/cqi.db` and seeds **12 months of synthetic data**
 (July 2025 – June 2026): 28 staff across four services, 34 people supported, ~24,000 support sessions,
-~160 incidents, 55 complaints and ~420 feedback records. Re-seed at any time with `npm run seed`
+~160 incidents, 55 complaints and ~420 feedback records. The people supported span a realistic mix of
+adult social care package types — **Supported Living, Residential Care, Community Outreach, Complex
+Support and Day Support** — shown across the app as service context only (care package is never part of
+the Quality Risk Index or any staff judgement). Re-seed at any time with `npm run seed`
 (deterministic — the same data is regenerated).
+
+> All demo data is **synthetic**. It does not represent real people, real service users, real staff
+> performance or real addresses. Provider and service names in the sample data are fictitious.
 
 ### Demo accounts
 

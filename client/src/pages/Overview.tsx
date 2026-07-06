@@ -3,7 +3,7 @@ import {
   ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 import { monthLabel, prefersReducedMotion, useApi } from "../api";
-import { Card, EmptyState, ErrorNote, KpiCard, SectionHeading, Spinner } from "../components/ui";
+import { CarePackageBars, Card, EmptyState, ErrorNote, KpiCard, SectionHeading, Spinner } from "../components/ui";
 import { useFilters } from "../store";
 import type { OverviewData } from "../types";
 
@@ -209,6 +209,18 @@ export default function Overview() {
               </Card>
             </div>
           </div>
+
+          {/* Secondary service context — care package mix. Not part of any risk measure. */}
+          <Card className="p-4">
+            <SectionHeading
+              title="Care package mix"
+              sub="Service context by share of delivered support · not a performance measure"
+            />
+            <div className="grid gap-x-8 gap-y-2 md:grid-cols-2">
+              <CarePackageBars rows={data.carePackageMix} metric="sessions" />
+              <CarePackageBars rows={data.carePackageMix} metric="clients" />
+            </div>
+          </Card>
         </>
       )}
     </div>

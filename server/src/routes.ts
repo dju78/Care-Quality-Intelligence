@@ -118,13 +118,23 @@ function loadProfile(req: import("express").Request, res: import("express").Resp
     .all(p) as any[];
   const actions = db.prepare("SELECT * FROM actions WHERE StaffID = ? ORDER BY CreatedDate DESC").all(req.params.id) as any[];
 
+  // Contextual service mix from this staff member's delivered support. Not a QRI or performance factor.
+  const carePackageContext = db
+    .prepare(
+      `SELECT c.CarePackage AS name, COUNT(DISTINCT v.ClientID) AS clients, COUNT(*) AS sessions
+       FROM visits v JOIN clients c ON c.ClientID = v.ClientID
+       WHERE v.StaffID = @id AND v.Status IN ('Completed','Late') AND v.VisitDate BETWEEN @start AND @end
+       GROUP BY c.CarePackage ORDER BY sessions DESC`
+    )
+    .all(p) as any[];
+
   const events = [
     ...incidents.map((e) => ({ type: "Incident" as const, ...e })),
     ...complaints.map((e) => ({ type: "Complaint" as const, ...e })),
     ...lowFeedback.map((e) => ({ type: "Low feedback" as const, ...e })),
   ].sort((a, b) => (a.date < b.date ? 1 : -1));
 
-  return { staff, period, metrics, feedbackTrend, visitsMonthly, events, feedbackThemes, actions };
+  return { staff, period, metrics, feedbackTrend, visitsMonthly, events, feedbackThemes, actions, carePackageContext };
 }
 
 router.get("/staff/:id", requireAuth, (req, res) => {

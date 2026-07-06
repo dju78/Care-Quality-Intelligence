@@ -302,6 +302,13 @@ export function computeOverview(period: Period, team: string | null) {
      WHERE FeedbackDate BETWEEN @start AND @end AND Score <= 2 ${teamClause(team, "v")}
      GROUP BY Theme ORDER BY count DESC LIMIT 8`
   );
+  // Contextual only: service mix by delivered support, never used in QRI or any judgement.
+  const carePackageMix = seriesRows(
+    `SELECT c.CarePackage AS name, COUNT(DISTINCT v.ClientID) AS clients, COUNT(*) AS sessions
+     FROM visits v JOIN clients c ON c.ClientID = v.ClientID
+     WHERE v.Status IN ('Completed','Late') AND v.VisitDate BETWEEN @start AND @end ${teamClause(team, "v")}
+     GROUP BY c.CarePackage ORDER BY sessions DESC`
+  );
 
   return {
     period,
@@ -324,6 +331,7 @@ export function computeOverview(period: Period, team: string | null) {
     byCategory,
     bySource,
     lowThemes,
+    carePackageMix,
   };
 }
 

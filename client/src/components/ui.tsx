@@ -159,6 +159,45 @@ export function ProgressBar({ pct, tone = "petrol" }: { pct: number; tone?: "pet
   );
 }
 
+// Fixed, non-judgemental colours for the five care-package types (context only).
+export const PACKAGE_COLOURS: Record<string, string> = {
+  "Supported Living": "#0F5257",
+  "Residential Care": "#5F9678",
+  "Community Outreach": "#D9A441",
+  "Complex Support": "#BF4A36",
+  "Day Support": "#7A908C",
+};
+
+/** Compact, secondary care-package mix. Contextual only — never a risk/judgement signal. */
+export function CarePackageBars({ rows, metric = "sessions" }: { rows: { name: string; clients: number; sessions: number }[]; metric?: "sessions" | "clients" }) {
+  if (!rows || rows.length === 0) {
+    return <p className="text-sm text-muted">No delivered support in this period.</p>;
+  }
+  const total = rows.reduce((s, r) => s + (metric === "clients" ? r.clients : r.sessions), 0) || 1;
+  return (
+    <ul className="space-y-2">
+      {rows.map((r) => {
+        const value = metric === "clients" ? r.clients : r.sessions;
+        const pct = Math.round((value / total) * 100);
+        return (
+          <li key={r.name} className="flex items-center gap-3 text-sm">
+            <span className="flex w-40 shrink-0 items-center gap-2 text-moss">
+              <span className="h-2.5 w-2.5 shrink-0 rounded-sm" style={{ background: PACKAGE_COLOURS[r.name] ?? "#7A908C" }} aria-hidden="true" />
+              <span className="truncate">{r.name}</span>
+            </span>
+            <span className="h-2.5 flex-1 overflow-hidden rounded-full bg-[#F0F1EF]" aria-hidden="true">
+              <span className="block h-full rounded-full" style={{ width: `${pct}%`, background: PACKAGE_COLOURS[r.name] ?? "#7A908C" }} />
+            </span>
+            <span className="w-24 shrink-0 text-right text-xs tabular text-muted">
+              {metric === "clients" ? `${r.clients} ${r.clients === 1 ? "person" : "people"}` : `${pct}%`}
+            </span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 /** Small tinted callout used for interpretation / governance notes. */
 export function Note({ tone = "petrol", title, children }: { tone?: "petrol" | "sage"; title?: string; children: ReactNode }) {
   const styles =

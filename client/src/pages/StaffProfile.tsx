@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api, dateLabel, monthLabel, prefersReducedMotion, useApi } from "../api";
-import { Avatar, Card, EmptyState, ErrorNote, Note, RagBadge, SectionHeading, SmallSampleTag, Spinner, StrongReporterBadge } from "../components/ui";
+import { Avatar, CarePackageBars, Card, EmptyState, ErrorNote, Note, RagBadge, SectionHeading, SmallSampleTag, Spinner, StrongReporterBadge } from "../components/ui";
 import { useFilters, useMeta } from "../store";
 import type { StaffProfile as Profile, TimelineEvent } from "../types";
 
@@ -150,6 +150,21 @@ export default function StaffProfile() {
           </Card>
         ))}
       </div>
+
+      {/* Service context — contextual only, never a performance factor */}
+      <Card className="p-4">
+        <SectionHeading title="Service context" sub="Care package types linked to this person's completed support in the period" />
+        {data.carePackageContext.length === 0 ? (
+          <EmptyState title="No delivered support in this period" hint="Care package context appears once support sessions are recorded for this staff member." />
+        ) : (
+          <>
+            <CarePackageBars rows={data.carePackageContext} metric="sessions" />
+            <p className="mt-3 text-xs italic text-muted">
+              Care package context helps explain workload mix. It is not used as a performance judgement.
+            </p>
+          </>
+        )}
+      </Card>
 
       <div className="grid gap-4 xl:grid-cols-2">
         <Card className="p-4">

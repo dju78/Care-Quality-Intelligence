@@ -6,6 +6,17 @@ import type { ImportValidation } from "../types";
 
 const TABLES = ["staff", "clients", "incidents", "complaints", "feedback", "visits", "actions"];
 
+// Required columns per table, shown as an at-a-glance schema checklist before upload.
+const SCHEMA_COLUMNS: Record<string, string[]> = {
+  staff: ["StaffID", "StaffName", "Role", "Team", "StartDate", "Status", "ContractedHours"],
+  clients: ["ClientID", "ClientRef", "CarePackage", "Area", "FundingType"],
+  incidents: ["IncidentID", "IncidentDate", "StaffID", "ClientID", "Category", "Severity", "ReportedWithin24h", "CQCNotifiable", "Status", "DateClosed"],
+  complaints: ["ComplaintID", "DateReceived", "StaffID", "ClientID", "Source", "Category", "Severity", "Outcome", "DateResolved"],
+  feedback: ["FeedbackID", "FeedbackDate", "ClientID", "StaffID", "Method", "Score", "WouldRecommend", "Theme"],
+  visits: ["VisitID", "VisitDate", "StaffID", "ClientID", "ScheduledStart", "ActualStart", "DurationMinutes", "Status"],
+  actions: ["ActionID", "StaffID", "CreatedDate", "Source", "Description", "Owner", "DueDate", "Status"],
+};
+
 interface Batch {
   BatchID: number;
   TableName: string;
@@ -116,6 +127,32 @@ export default function DataManager() {
               Download {table} template
             </button>
           </div>
+
+          {/* Schema checklist for the selected table */}
+          <div className="mt-4 rounded-lg border border-line bg-mist/60 p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-label">
+              Required columns · {table}
+            </p>
+            <ul className="mt-2 flex flex-wrap gap-1.5">
+              {SCHEMA_COLUMNS[table].map((col) => (
+                <li
+                  key={col}
+                  className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs tabular ${
+                    col === "CarePackage" ? "border-petrol/40 bg-petrol-50 font-semibold text-petrol-700" : "border-line bg-white text-moss"
+                  }`}
+                >
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                  {col}
+                </li>
+              ))}
+            </ul>
+            {table === "clients" && (
+              <p className="mt-2 text-xs text-muted">
+                <span className="font-medium text-petrol-700">CarePackage</span> is contextual service information (e.g. Supported Living, Residential Care, Community Outreach, Complex Support, Day Support). It is not used in the Quality Risk Index.
+              </p>
+            )}
+          </div>
+
           <label htmlFor="import-file" className="mt-4 block text-sm font-medium text-ink">File</label>
           <input
             id="import-file"
@@ -217,7 +254,9 @@ export default function DataManager() {
             <table className="w-full border-collapse text-xs">
               <thead>
                 <tr className="border-b-2 border-ink/30 text-left uppercase tracking-wide text-ink/60">
-                  {result.columns?.map((c) => <th key={c} className="px-2 py-2">{c}</th>)}
+                  {result.columns?.map((c) => (
+                    <th key={c} className={`px-2 py-2 ${c === "CarePackage" ? "text-petrol-700" : ""}`}>{c}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
