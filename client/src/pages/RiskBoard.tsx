@@ -11,15 +11,15 @@ const BAND_EDGE: Record<string, string> = { Red: "#BF4A36", Amber: "#D9A441", Gr
 const CHIPS = [
   { key: "All", label: "All" },
   { key: "Red", label: "Priority attention" },
-  { key: "Amber", label: "Review" },
-  { key: "Green", label: "Within range" },
-  { key: "Not rated", label: "Not rated" },
+  { key: "Amber", label: "Review in supervision" },
+  { key: "Green", label: "Within expected range" },
+  { key: "Not rated", label: "Insufficient sample" },
 ];
 const LEGEND = [
   { edge: "#BF4A36", label: "Priority attention", note: "QRI ≥ 25" },
   { edge: "#D9A441", label: "Review in supervision", note: "QRI 12–25" },
   { edge: "#5F9678", label: "Within expected range", note: "QRI < 12" },
-  { edge: "#c2cec9", label: "Not rated", note: "sample too small" },
+  { edge: "#c2cec9", label: "Insufficient sample", note: "too few sessions or responses" },
 ];
 
 export default function RiskBoard() {

@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { api, useApi } from "../api";
 import { Card, ErrorNote, SectionHeading, Spinner } from "../components/ui";
 import { useMeta } from "../store";
@@ -10,7 +10,14 @@ const WEIGHT_LABELS: Record<string, string> = {
   upheldComplaint: "Each upheld / partially upheld complaint (+)",
   lowFeedbackScore: "Each feedback score of 1-2 (+)",
 };
-const BAND_LABELS: Record<string, string> = { red: "Red at QRI ≥", amber: "Amber at QRI ≥" };
+// Configuration uses the classic RAG names; the interface shows supervision-focused labels.
+const BAND_LABELS: Record<string, string> = { red: "Red band starts at QRI ≥", amber: "Amber band starts at QRI ≥" };
+const RAG_MAPPING: { swatch: string; band: string; logic: string; shown: string }[] = [
+  { swatch: "#BF4A36", band: "Red", logic: "QRI ≥ red threshold", shown: "Priority attention" },
+  { swatch: "#D9A441", band: "Amber", logic: "QRI amber to below red", shown: "Review in supervision" },
+  { swatch: "#5F9678", band: "Green", logic: "QRI below amber", shown: "Within expected range" },
+  { swatch: "#c2cec9", band: "Grey / suppressed", logic: "sample below the minimums", shown: "Insufficient sample" },
+];
 const SAMPLE_LABELS: Record<string, string> = { minFeedback: "Minimum feedback responses", minVisits: "Minimum completed sessions" };
 const TARGET_LABELS: Record<string, string> = {
   reportedWithin24hPct: "24-hour reporting target (%)",
@@ -19,7 +26,7 @@ const TARGET_LABELS: Record<string, string> = {
 };
 
 function ConfigSection({
-  title, sub, configKey, labels, values, onSaved,
+  title, sub, configKey, labels, values, onSaved, footer,
 }: {
   title: string;
   sub: string;
@@ -27,6 +34,7 @@ function ConfigSection({
   labels: Record<string, string>;
   values: Record<string, number>;
   onSaved: () => void;
+  footer?: ReactNode;
 }) {
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
@@ -78,6 +86,7 @@ function ConfigSection({
           {saved && <span role="status" className="text-sm font-medium text-sage-600">Saved - change recorded in the audit log</span>}
         </div>
       </form>
+      {footer}
     </Card>
   );
 }
@@ -126,11 +135,27 @@ export default function Admin() {
               />
               <ConfigSection
                 title="RAG banding thresholds"
-                sub="Green is anything below the Amber threshold"
+                sub="Classic RAG thresholds drive the logic; the interface shows supervision-focused labels. Green is anything below the Amber threshold."
                 configKey="ragBands"
                 labels={BAND_LABELS}
                 values={config.ragBands as unknown as Record<string, number>}
                 onSaved={reloadMeta}
+                footer={
+                  <div className="mt-4 border-t border-line pt-3">
+                    <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-label">How each band is shown to users</p>
+                    <ul className="space-y-1.5">
+                      {RAG_MAPPING.map((r) => (
+                        <li key={r.band} className="flex items-center gap-2.5 text-[12.5px]">
+                          <span className="h-3 w-3 shrink-0 rounded-sm" style={{ background: r.swatch }} aria-hidden="true" />
+                          <span className="w-32 shrink-0 font-medium text-ink">{r.band}</span>
+                          <span className="w-44 shrink-0 text-muted">{r.logic === "QRI ≥ red threshold" ? `QRI ≥ ${config.ragBands.red}` : r.logic === "QRI amber to below red" ? `QRI ${config.ragBands.amber} to <${config.ragBands.red}` : r.logic === "QRI below amber" ? `QRI < ${config.ragBands.amber}` : r.logic}</span>
+                          <span className="text-faint">→</span>
+                          <span className="font-medium text-petrol-700">“{r.shown}”</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                }
               />
               <ConfigSection
                 title="Small sample thresholds"

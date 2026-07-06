@@ -76,9 +76,9 @@ export function RagBadge({ band, suppressed }: { band: "Red" | "Amber" | "Green"
     return (
       <span
         className="inline-flex items-center rounded-full bg-[#EEF2F0] px-2.5 py-0.5 text-[11px] font-semibold text-muted"
-        title="RAG banding is withheld: the sample is too small for a fair judgement"
+        title="Banding is withheld: the sample is too small for a fair judgement"
       >
-        Not rated
+        Insufficient sample
       </span>
     );
   }
