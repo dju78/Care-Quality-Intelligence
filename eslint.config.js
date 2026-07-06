@@ -4,7 +4,8 @@ import reactHooks from "eslint-plugin-react-hooks";
 import globals from "globals";
 
 export default tseslint.config(
-  { ignores: ["**/dist/**", "**/node_modules/**", "Aldanat_Quality_Dashboard.jsx"] },
+  // CQI_Quality_Dashboard_Reference.jsx is a standalone Power BI reference mock, not part of the app build.
+  { ignores: ["**/dist/**", "**/node_modules/**", "CQI_Quality_Dashboard_Reference.jsx"] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

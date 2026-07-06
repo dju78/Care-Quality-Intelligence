@@ -4,7 +4,7 @@ Copy everything below this line into Claude Code in an empty project folder.
 
 ---
 
-Build a production quality web application called **Aldanat Quality Intelligence (AQI)**, a staff quality performance platform for a domiciliary care provider in Essex, England. The audience is the registered manager, directors, and team leaders. The purpose is to monitor incidents, complaints, and client feedback at organisation, team, and individual carer level, and to turn that monitoring into supervision actions and CQC inspection evidence. This must feel like a commercial product, not a dashboard prototype.
+Build a production quality web application called **Care Quality Intelligence (CQI)**, a staff quality performance platform for a care provider delivering residential, supported living and community outreach services for adults with learning disabilities. All demo data is synthetic and does not represent real people, real staff performance, or real service users. The audience is the registered manager, directors, and team leaders. The purpose is to monitor incidents, complaints, and client feedback at organisation, team, and individual carer level, and to turn that monitoring into supervision actions and CQC inspection evidence. This must feel like a commercial product, not a dashboard prototype.
 
 ## Tech stack
 

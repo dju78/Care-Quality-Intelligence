@@ -17,40 +17,40 @@
   h1,h2,h3,h4{font-family:Sora,Inter,sans-serif;margin:0;}
   ::selection{background:#D2E5E5;}
   :focus-visible{outline:3px solid #0F5257;outline-offset:2px;border-radius:5px;}
-  .aqi-scroll::-webkit-scrollbar{width:10px;height:10px;}
-  .aqi-scroll::-webkit-scrollbar-thumb{background:#cdd9d5;border-radius:8px;border:2px solid #F3F6F5;}
-  .aqi-mobilebar{display:none;}
+  .cqi-scroll::-webkit-scrollbar{width:10px;height:10px;}
+  .cqi-scroll::-webkit-scrollbar-thumb{background:#cdd9d5;border-radius:8px;border:2px solid #F3F6F5;}
+  .cqi-mobilebar{display:none;}
   [data-cols="attn"]{grid-template-columns:1.4fr 2fr !important;}
   @media(max-width:1080px){[data-cols="attn"]{grid-template-columns:1fr !important;}}
   @media(max-width:820px){
-    .aqi-sidebar{display:none !important;}
-    .aqi-mobilebar{display:flex !important;}
-    .aqi-shell{flex-direction:column !important;}
-    .aqi-main{padding:18px 16px 40px !important;}
+    .cqi-sidebar{display:none !important;}
+    .cqi-mobilebar{display:flex !important;}
+    .cqi-shell{flex-direction:column !important;}
+    .cqi-main{padding:18px 16px 40px !important;}
   }
   @media(prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important;}}
   @media print{
     @page{size:A4;margin:14mm 13mm;}
     html,body{background:#fff !important;}
-    .aqi-sidebar,.aqi-mobilebar,[data-chrome]{display:none !important;}
-    .aqi-shell{display:block !important;}
-    .aqi-main{padding:0 !important;max-width:none !important;}
-    .aqi-sheet{box-shadow:none !important;border:none !important;border-radius:0 !important;margin:0 !important;max-width:none !important;padding:0 !important;}
+    .cqi-sidebar,.cqi-mobilebar,[data-chrome]{display:none !important;}
+    .cqi-shell{display:block !important;}
+    .cqi-main{padding:0 !important;max-width:none !important;}
+    .cqi-sheet{box-shadow:none !important;border:none !important;border-radius:0 !important;margin:0 !important;max-width:none !important;padding:0 !important;}
     .print-break{break-before:page;}
     .avoid-break{break-inside:avoid;}
   }
 </style>
 </helmet>
 
-<div class="aqi-shell aqi-scroll" style="display:flex;min-height:100vh;background:#F3F6F5;">
+<div class="cqi-shell cqi-scroll" style="display:flex;min-height:100vh;background:#F3F6F5;">
 
   <!-- ============ SIDEBAR (desktop) ============ -->
-  <aside class="aqi-sidebar" style="width:264px;flex-shrink:0;background:#FFFFFF;border-right:1px solid #DDE6E3;display:flex;flex-direction:column;justify-content:space-between;position:sticky;top:0;height:100vh;padding:22px 16px;">
+  <aside class="cqi-sidebar" style="width:264px;flex-shrink:0;background:#FFFFFF;border-right:1px solid #DDE6E3;display:flex;flex-direction:column;justify-content:space-between;position:sticky;top:0;height:100vh;padding:22px 16px;">
     <div>
       <div style="display:flex;align-items:center;gap:11px;padding:0 4px 4px;">
         <span style="display:flex;height:38px;width:38px;align-items:center;justify-content:center;border-radius:11px;background:#0F5257;color:#fff;font-family:Sora;font-weight:700;font-size:14px;letter-spacing:.5px;">AQ</span>
         <span style="line-height:1.1;">
-          <span style="display:block;font-family:Sora;font-weight:600;font-size:15px;color:#12333A;">Aldanat Quality</span>
+          <span style="display:block;font-family:Sora;font-weight:600;font-size:15px;color:#12333A;">Care Quality</span>
           <span style="display:block;font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:#0F5257;margin-top:2px;">Intelligence</span>
         </span>
       </div>
@@ -89,15 +89,15 @@
   </aside>
 
   <!-- ============ MOBILE TOP BAR ============ -->
-  <header class="aqi-mobilebar" style="position:sticky;top:0;z-index:40;align-items:center;justify-content:space-between;background:#fff;border-bottom:1px solid #DDE6E3;padding:12px 16px;">
+  <header class="cqi-mobilebar" style="position:sticky;top:0;z-index:40;align-items:center;justify-content:space-between;background:#fff;border-bottom:1px solid #DDE6E3;padding:12px 16px;">
     <div style="display:flex;align-items:center;gap:10px;">
       <span style="display:flex;height:34px;width:34px;align-items:center;justify-content:center;border-radius:10px;background:#0F5257;color:#fff;font-family:Sora;font-weight:700;font-size:13px;">AQ</span>
-      <span style="font-family:Sora;font-weight:600;font-size:14px;">Aldanat Quality Intelligence</span>
+      <span style="font-family:Sora;font-weight:600;font-size:14px;">Care Quality Intelligence</span>
     </div>
     <button onClick="{{ toggleNav }}" aria-label="Menu" style="border:1px solid #DDE6E3;background:#fff;border-radius:9px;padding:7px 10px;cursor:pointer;color:#12333A;font-size:16px;line-height:1;">≡</button>
   </header>
   <sc-if value="{{ navOpen }}" hint-placeholder-val="{{ false }}">
-    <nav class="aqi-mobilebar" style="flex-direction:column;background:#fff;border-bottom:1px solid #DDE6E3;padding:8px 12px;gap:2px;">
+    <nav class="cqi-mobilebar" style="flex-direction:column;background:#fff;border-bottom:1px solid #DDE6E3;padding:8px 12px;gap:2px;">
       <sc-for list="{{ navAll }}" as="item" hint-placeholder-count="6">
         <button onClick="{{ item.go }}" style="{{ item.styleMobile }}">{{ item.label }}</button>
       </sc-for>
@@ -134,7 +134,7 @@
       </div>
     </div>
 
-    <main class="aqi-main" style="flex:1;max-width:1240px;width:100%;margin:0 auto;padding:26px 32px 56px;">
+    <main class="cqi-main" style="flex:1;max-width:1240px;width:100%;margin:0 auto;padding:26px 32px 56px;">
 
       <!-- ======================= OVERVIEW ======================= -->
       <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}">
@@ -465,11 +465,11 @@
         </div>
 
         <!-- A4 sheet -->
-        <article class="aqi-sheet" style="max-width:820px;margin:26px auto;background:#fff;border:1px solid #DDE6E3;border-radius:6px;box-shadow:0 4px 24px rgba(18,51,58,0.08);padding:44px 46px;">
+        <article class="cqi-sheet" style="max-width:820px;margin:26px auto;background:#fff;border:1px solid #DDE6E3;border-radius:6px;box-shadow:0 4px 24px rgba(18,51,58,0.08);padding:44px 46px;">
 
           <header style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;border-bottom:3px solid #0F5257;padding-bottom:16px;">
             <div>
-              <p style="margin:0;font-family:Sora;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#0F5257;">Aldanat Care · Confidential</p>
+              <p style="margin:0;font-family:Sora;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#0F5257;">Care Quality Intelligence · Confidential</p>
               <h1 style="margin:7px 0 0;font-family:Sora;font-size:24px;font-weight:700;color:#12333A;">Supervision pack: Callum Barnes</h1>
               <p style="margin:6px 0 0;font-size:12.5px;color:#5B7370;">Support Worker · The Retreat · Staff ID S005 · started 14 Mar 2019</p>
             </div>
@@ -614,7 +614,7 @@
             </div>
           </section>
 
-          <footer style="margin-top:34px;border-top:1px solid #DDE6E3;padding-top:12px;font-size:9.5px;color:#8aa09b;line-height:1.5;">Aldanat Quality Intelligence · Confidential HR record — store in the staff member's supervision file · Data minimised: no names of people we support appear in this document.</footer>
+          <footer style="margin-top:34px;border-top:1px solid #DDE6E3;padding-top:12px;font-size:9.5px;color:#8aa09b;line-height:1.5;">Care Quality Intelligence · Confidential HR record — store in the staff member's supervision file · Data minimised: no names of people we support appear in this document.</footer>
         </article>
       </div>
       </sc-if>
@@ -629,7 +629,7 @@
             </span>
             <div>
               <p style="margin:0;font-size:13.5px;font-weight:600;color:#0B3F43;">Inspection-ready evidence</p>
-              <p style="margin:3px 0 0;font-size:12.5px;color:#2f4f4c;max-width:640px;line-height:1.45;">AQI metrics are mapped to the CQC single assessment framework quality statements for <strong style="font-weight:600;">Safe</strong> and <strong style="font-weight:600;">Well-led</strong>. Every figure is drawn from source records and is exportable as a dated evidence pack.</p>
+              <p style="margin:3px 0 0;font-size:12.5px;color:#2f4f4c;max-width:640px;line-height:1.45;">CQI metrics are mapped to the CQC single assessment framework quality statements for <strong style="font-weight:600;">Safe</strong> and <strong style="font-weight:600;">Well-led</strong>. Every figure is drawn from source records and is exportable as a dated evidence pack.</p>
             </div>
           </div>
           <button onClick="{{ exportPack }}" data-chrome style="display:inline-flex;flex-shrink:0;align-items:center;gap:8px;background:#0F5257;color:#fff;border:none;border-radius:10px;padding:11px 18px;font-family:Inter;font-size:13.5px;font-weight:600;cursor:pointer;">
@@ -689,7 +689,7 @@
         <div style="background:#fff;border:1px solid #DDE6E3;border-radius:14px;padding:17px 18px;box-shadow:0 1px 2px rgba(18,51,58,0.04);">
           <h2 style="font-family:Sora;font-size:15.5px;font-weight:600;color:#12333A;">Notifiable incident log</h2>
           <p style="margin:3px 0 12px;font-size:12px;color:#5B7370;">Events notifiable to CQC under Regulation 18, with reporting timeliness · showing 9 of 19</p>
-          <div class="aqi-scroll" style="overflow-x:auto;">
+          <div class="cqi-scroll" style="overflow-x:auto;">
             <table style="width:100%;min-width:680px;border-collapse:collapse;">
               <thead><tr>
                 <sc-for list="{{ notifHeads }}" as="c" hint-placeholder-count="8">
@@ -744,7 +744,7 @@
       <sc-if value="{{ isStub }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border:1px dashed #cdd9d5;border-radius:14px;background:#fff;padding:64px 24px;text-align:center;">
           <h2 style="font-size:16px;font-weight:600;color:#3d5450;">{{ pageTitle }}</h2>
-          <p style="font-size:13px;color:#7a908c;max-width:420px;">This secondary screen uses the same AQI design system. It is designed after the five priority screens.</p>
+          <p style="font-size:13px;color:#7a908c;max-width:420px;">This secondary screen uses the same CQI design system. It is designed after the five priority screens.</p>
         </div>
       </sc-if>
 
@@ -949,7 +949,7 @@ class Component extends DCLogic {
     const safe = map([
       { title:"Learning culture", quote:"We have a proactive and positive culture of safety based on openness and honesty, in which safety events are investigated and reported thoroughly, and lessons are learned.", evidence:[
         { label:"Incidents reported within 24 hours", target:"target 90% · met", value:"95%", met:true },
-        { label:"Incidents logged in period", target:"all staff report through AQI", value:"163", met:true },
+        { label:"Incidents logged in period", target:"all staff report through CQI", value:"163", met:true },
         { label:"Learning actions completed", target:"46 of 56 actions", value:"82%", met:true },
       ]},
       { title:"Safeguarding", quote:"We work with people to understand what being safe means to them and work with our partners to develop the best way to achieve this.", evidence:[
@@ -990,15 +990,15 @@ class Component extends DCLogic {
       { key: "gdpr", label: "GDPR & Governance" },
     ];
     const titles = {
-      overview: ["Quality overview", "Incidents, complaints and feedback across all Aldanat services · last 12 months"],
+      overview: ["Quality overview", "Incidents, complaints and feedback across all care services · last 12 months"],
       risk: ["Staff risk board", "Quality Risk Index per carer, normalised per 100 completed visits · last 12 months"],
       profile: ["Staff profile", "Supervision view · figures normalised per 100 completed visits"],
       pack: ["Supervision pack", "Print-ready evidence pack for the staff supervision file"],
       cqc: ["CQC evidence", "Metrics mapped to the single assessment framework · inspection-ready evidence"],
-      data: ["Data manager", "Import and validate Excel or CSV extracts against the AQI schema"],
+      data: ["Data manager", "Import and validate Excel or CSV extracts against the CQI schema"],
       admin: ["Admin", "QRI configuration, user accounts and the audit trail"],
       audit: ["Audit log", "Every import, edit, export, sign-in and configuration change"],
-      gdpr: ["GDPR & governance", "How AQI handles personal data — written for managers and inspectors"],
+      gdpr: ["GDPR & governance", "How CQI handles personal data — written for managers and inspectors"],
     };
 
     const periods = [3, 6, 12].map((m) => ({

@@ -34,7 +34,7 @@ const mLabel = (k) => {
   return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+m - 1] + " " + y.slice(2);
 };
 
-export default function AldanatQualityDashboard() {
+export default function CQIQualityDashboardReference() {
   const [team, setTeam] = useState("All");
   const [period, setPeriod] = useState(12);
   const [selected, setSelected] = useState(null);
@@ -168,10 +168,10 @@ export default function AldanatQualityDashboard() {
         <div style={{ maxWidth: 1180, margin: "0 auto", display: "flex", flexWrap: "wrap", gap: 16, alignItems: "flex-end", justifyContent: "space-between" }}>
           <div>
             <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 22 }}>
-              Aldanat Care <span style={{ color: C.sage }}>·</span> Quality Performance
+              Care Quality Intelligence <span style={{ color: C.sage }}>·</span> Quality Performance
             </div>
             <div style={{ fontSize: 13, color: "#B8CBC7", marginTop: 4 }}>
-              Incidents, complaints and client feedback · sample data, Jul 2025 to Jun 2026
+              Incidents, complaints and client feedback · synthetic demo data, Jul 2025 to Jun 2026
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>

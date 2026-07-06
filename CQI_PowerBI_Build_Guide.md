@@ -1,13 +1,15 @@
-# Aldanat Care — Staff Quality Performance Dashboard
+# Care Quality Intelligence — Staff Quality Performance Dashboard
 ## Power BI Build Guide
 
 Scope: quality domain (incidents, complaints, client feedback), monitored at organisation, team, and individual staff level over a rolling 12 months.
+
+> **Note:** This guide and the accompanying `CQI_Synthetic_Quality_Sample_Data.xlsx` use **synthetic demo data only**. Staff, service users, incidents, complaints and feedback are entirely fictitious and do not represent real people, real staff performance, or real service users.
 
 ---
 
 ## 1. Load the data
 
-1. Open Power BI Desktop, choose Get Data, then Excel, and select `Aldanat_Care_Quality_Sample_Data.xlsx`.
+1. Open Power BI Desktop, choose Get Data, then Excel, and select `CQI_Synthetic_Quality_Sample_Data.xlsx`.
 2. Tick the five tables: Staff, Clients, Incidents, Complaints, Feedback. Do not load README.
 3. In Power Query, confirm data types: all date columns as Date, Score as Whole Number, everything else as Text. Click Close and Apply.
 
