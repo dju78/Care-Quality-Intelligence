@@ -3,7 +3,7 @@ import {
   ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 import { monthLabel, prefersReducedMotion, useApi } from "../api";
-import { CarePackageBars, Card, EmptyState, ErrorNote, KpiCard, SectionHeading, Spinner } from "../components/ui";
+import { CarePackageBars, Card, EmptyState, ErrorNote, KpiCard, NetworkNote, SectionHeading, Spinner } from "../components/ui";
 import { useFilters } from "../store";
 import type { OverviewData } from "../types";
 
@@ -42,15 +42,15 @@ const tooltipStyle = {
 
 export default function Overview() {
   const { team, months } = useFilters();
-  const { data, loading, error } = useApi<OverviewData>(`/api/overview?months=${months}&team=${encodeURIComponent(team)}`);
+  const { data, loading, waking, error, isNetwork, retry } = useApi<OverviewData>(`/api/overview?months=${months}&team=${encodeURIComponent(team)}`);
 
   const belowFeedback = data && data.kpis.avgFeedback !== null && data.kpis.avgFeedback < data.targets.avgFeedback;
   const below24h = data && data.kpis.reported24hPct !== null && data.kpis.reported24hPct < data.targets.reportedWithin24hPct;
 
   return (
     <div className="space-y-5">
-      {error && <ErrorNote message={error} />}
-      {loading && <Spinner label="Loading overview" />}
+      {loading && <Spinner label={waking ? "Waking the demo server and loading synthetic data" : "Loading overview"} />}
+      {error && (isNetwork ? <NetworkNote onRetry={retry} /> : <ErrorNote message={error} />)}
 
       {data && (
         <>

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useApi } from "../api";
-import { EmptyState, ErrorNote, Note, RagBadge, SmallSampleTag, Spinner, StrongReporterBadge } from "../components/ui";
+import { EmptyState, ErrorNote, NetworkNote, Note, RagBadge, SmallSampleTag, Spinner, StrongReporterBadge } from "../components/ui";
 import { useFilters, useMeta } from "../store";
 import type { Period, StaffMetrics } from "../types";
 
@@ -26,7 +26,7 @@ export default function RiskBoard() {
   const { team, months } = useFilters();
   const { meta } = useMeta();
   const [bandFilter, setBandFilter] = useState<string>("All");
-  const { data, loading, error } = useApi<{ period: Period; staff: StaffMetrics[] }>(
+  const { data, loading, waking, error, isNetwork, retry } = useApi<{ period: Period; staff: StaffMetrics[] }>(
     `/api/staff?months=${months}&team=${encodeURIComponent(team)}`
   );
 
@@ -88,8 +88,8 @@ export default function RiskBoard() {
         ))}
       </div>
 
-      {error && <ErrorNote message={error} />}
-      {loading && <Spinner label="Ranking staff" />}
+      {loading && <Spinner label={waking ? "Waking the demo server and loading synthetic data" : "Ranking staff"} />}
+      {error && (isNetwork ? <NetworkNote onRetry={retry} /> : <ErrorNote message={error} />)}
 
       {data && sorted.length === 0 && (
         <EmptyState title="No staff match this view" hint="Try another band or widen the service and period filters above." />

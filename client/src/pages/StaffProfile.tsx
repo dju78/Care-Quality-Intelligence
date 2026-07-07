@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api, dateLabel, monthLabel, prefersReducedMotion, useApi } from "../api";
-import { Avatar, CarePackageBars, Card, EmptyState, ErrorNote, Note, RagBadge, SectionHeading, SmallSampleTag, Spinner, StrongReporterBadge } from "../components/ui";
+import { Avatar, CarePackageBars, Card, EmptyState, ErrorNote, NetworkNote, Note, RagBadge, SectionHeading, SmallSampleTag, Spinner, StrongReporterBadge } from "../components/ui";
 import { useFilters, useMeta } from "../store";
 import type { StaffProfile as Profile, TimelineEvent } from "../types";
 
@@ -45,7 +45,7 @@ export default function StaffProfile() {
   const { months } = useFilters();
   const { meta } = useMeta();
   const [refresh, setRefresh] = useState(0);
-  const { data, loading, error } = useApi<Profile>(id ? `/api/staff/${id}?months=${months}` : null, refresh);
+  const { data, loading, waking, error, isNetwork, retry } = useApi<Profile>(id ? `/api/staff/${id}?months=${months}` : null, refresh);
   const [showActionForm, setShowActionForm] = useState(false);
   const [actionText, setActionText] = useState("");
   const [actionDue, setActionDue] = useState("");
@@ -79,8 +79,8 @@ export default function StaffProfile() {
     }
   };
 
-  if (loading) return <Spinner label="Loading profile" />;
-  if (error) return <ErrorNote message={error} />;
+  if (loading) return <Spinner label={waking ? "Waking the demo server and loading synthetic data" : "Loading profile"} />;
+  if (error) return isNetwork ? <NetworkNote onRetry={retry} /> : <ErrorNote message={error} />;
   if (!data) return null;
 
   const m = data.metrics;

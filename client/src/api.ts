@@ -7,6 +7,7 @@ import { useAuth } from "./store";
 const API_BASE = (import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
 export const apiUrl = (path: string) => (path.startsWith("/api") ? API_BASE + path : path);
 
+/** A real HTTP response was received (e.g. 401 invalid credentials, 403, 404). */
 export class ApiError extends Error {
   status: number;
   constructor(status: number, message: string) {
@@ -15,13 +16,35 @@ export class ApiError extends Error {
   }
 }
 
+/** The request never reached the server — offline, DNS, CORS, or a cold-start
+ * timeout on the free hosting tier. Distinct from ApiError so the UI can offer
+ * a calm "waking up" state instead of a raw "Failed to fetch". */
+export class NetworkError extends Error {
+  constructor(message = "Couldn't reach the demo server — it may be waking up. Please try again in a moment.") {
+    super(message);
+    this.name = "NetworkError";
+  }
+}
+
+export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const { token, clearAuth } = useAuth.getState();
   const headers = new Headers(options.headers);
   if (token) headers.set("Authorization", `Bearer ${token}`);
   if (options.body && !(options.body instanceof FormData)) headers.set("Content-Type", "application/json");
-  const res = await fetch(apiUrl(path), { ...options, headers });
-  if (res.status === 401) {
+
+  let res: Response;
+  try {
+    res = await fetch(apiUrl(path), { ...options, headers });
+  } catch {
+    // fetch() only rejects on network-level failures (never on HTTP status).
+    throw new NetworkError();
+  }
+
+  // Only treat 401 as "session expired" for authenticated requests. During login
+  // there is no token, so a 401 is invalid credentials and its body is surfaced.
+  if (res.status === 401 && token) {
     clearAuth();
     throw new ApiError(401, "Your session has expired. Please sign in again.");
   }
@@ -38,26 +61,73 @@ export const api = {
   patch: <T>(path: string, body: unknown) => request<T>(path, { method: "PATCH", body: JSON.stringify(body) }),
 };
 
-/** Simple data hook with loading/error state; refetches when the key changes. */
+// Silent auto-retries for a cold-starting free server before surfacing an error.
+const COLD_START_RETRIES = 2;
+const COLD_START_DELAY_MS = 10000;
+
+/**
+ * Data hook with cold-start handling. On a network failure it retries quietly a
+ * couple of times (surfacing `waking` so the UI can show a calm message), then
+ * exposes `isNetwork` + `retry()` for a friendly "Try again" state. HTTP errors
+ * (auth/permission) are surfaced immediately with their curated message.
+ */
 export function useApi<T>(path: string | null, refreshKey = 0) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(!!path);
+  const [waking, setWaking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isNetwork, setIsNetwork] = useState(false);
+  const [tick, setTick] = useState(0);
+
   useEffect(() => {
     if (!path) return;
     let cancelled = false;
     setLoading(true);
+    setWaking(false);
     setError(null);
-    api
-      .get<T>(path)
-      .then((d) => !cancelled && setData(d))
-      .catch((e: Error) => !cancelled && setError(e.message))
-      .finally(() => !cancelled && setLoading(false));
+    setIsNetwork(false);
+
+    (async () => {
+      for (let attempt = 0; attempt <= COLD_START_RETRIES; attempt++) {
+        try {
+          const d = await api.get<T>(path);
+          if (!cancelled) {
+            setData(d);
+            setLoading(false);
+          }
+          return;
+        } catch (e) {
+          if (e instanceof NetworkError) {
+            if (attempt < COLD_START_RETRIES) {
+              if (!cancelled) setWaking(true); // keep the calm loading state, note we're waking the server
+              await sleep(COLD_START_DELAY_MS);
+              if (cancelled) return;
+              continue;
+            }
+            if (!cancelled) {
+              setError("The demo server is taking longer than expected to wake up.");
+              setIsNetwork(true);
+              setLoading(false);
+            }
+            return;
+          }
+          if (!cancelled) {
+            setError((e as Error).message);
+            setIsNetwork(false);
+            setLoading(false);
+          }
+          return;
+        }
+      }
+    })();
+
     return () => {
       cancelled = true;
     };
-  }, [path, refreshKey]);
-  return { data, loading, error };
+  }, [path, refreshKey, tick]);
+
+  const retry = () => setTick((t) => t + 1);
+  return { data, loading, waking, error, isNetwork, retry };
 }
 
 export const monthLabel = (ym: string) => {

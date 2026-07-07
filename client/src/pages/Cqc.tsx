@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { dateLabel, useApi } from "../api";
-import { Card, EmptyState, ErrorNote, ProgressBar, SectionDivider, SectionHeading, Spinner } from "../components/ui";
+import { Card, EmptyState, ErrorNote, NetworkNote, ProgressBar, SectionDivider, SectionHeading, Spinner } from "../components/ui";
 import { useFilters, useMeta } from "../store";
 import type { CqcData } from "../types";
 
@@ -65,7 +65,7 @@ export function qualityStatements(d: CqcData, targets: { reportedWithin24hPct: n
 export default function Cqc() {
   const { team, months } = useFilters();
   const { meta } = useMeta();
-  const { data, loading, error } = useApi<CqcData>(`/api/cqc?months=${months}&team=${encodeURIComponent(team)}`);
+  const { data, loading, waking, error, isNetwork, retry } = useApi<CqcData>(`/api/cqc?months=${months}&team=${encodeURIComponent(team)}`);
 
   return (
     <div className="space-y-5">
@@ -91,8 +91,8 @@ export default function Cqc() {
         </Link>
       </div>
 
-      {error && <ErrorNote message={error} />}
-      {loading && <Spinner label="Compiling evidence" />}
+      {loading && <Spinner label={waking ? "Waking the demo server and loading synthetic data" : "Compiling evidence"} />}
+      {error && (isNetwork ? <NetworkNote onRetry={retry} /> : <ErrorNote message={error} />)}
 
       {data && meta && (
         <>

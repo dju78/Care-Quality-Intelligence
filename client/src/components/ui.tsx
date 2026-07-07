@@ -150,6 +150,28 @@ export function ErrorNote({ message }: { message: string }) {
   );
 }
 
+/** Calm cold-start state for a free-tier server that is waking up. */
+export function NetworkNote({ onRetry }: { onRetry?: () => void }) {
+  return (
+    <div role="status" className="flex flex-col items-center gap-3 rounded-xl border border-line bg-white px-6 py-10 text-center shadow-card">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" className="text-petrol" aria-hidden="true">
+        <path d="M12 3v3M12 18v3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M3 12h3M18 12h3M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+      <div>
+        <p className="font-display font-semibold text-ink">The demo server is waking up</p>
+        <p className="mx-auto mt-1 max-w-md text-sm text-muted">
+          This demo runs on a free hosting tier that sleeps after inactivity. Waking it can take up to a minute — no data has been lost.
+        </p>
+      </div>
+      {onRetry && (
+        <button onClick={onRetry} className="rounded-lg bg-petrol px-4 py-2 text-sm font-semibold text-white hover:bg-petrol-700">
+          Try again
+        </button>
+      )}
+    </div>
+  );
+}
+
 export function ProgressBar({ pct, tone = "petrol" }: { pct: number; tone?: "petrol" | "sage" | "amber" | "rust" }) {
   const colours = { petrol: "bg-petrol", sage: "bg-sage", amber: "bg-amber", rust: "bg-rust" };
   return (
