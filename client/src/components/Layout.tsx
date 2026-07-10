@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { api } from "../api";
 import { useAuth, useFilters, useMeta } from "../store";
 import type { Meta } from "../types";
@@ -120,6 +121,7 @@ export default function Layout() {
   const setMeta = useMeta((s) => s.setMeta);
   const navigate = useNavigate();
   const location = useLocation();
+  const reduceMotion = useReducedMotion();
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -209,9 +211,19 @@ export default function Layout() {
           </div>
         </div>
 
-        <main id="main" className="mx-auto w-full max-w-[1240px] flex-1 px-4 py-7 lg:px-8">
-          <Outlet />
-        </main>
+        <AnimatePresence mode="wait">
+          <motion.main
+            key={location.pathname}
+            id="main"
+            className="mx-auto w-full max-w-[1240px] flex-1 px-4 py-7 lg:px-8"
+            initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+          >
+            <Outlet />
+          </motion.main>
+        </AnimatePresence>
         <footer className="mx-auto max-w-[1240px] px-4 pb-7 text-[11.5px] text-faint lg:px-8">
           Care Quality Intelligence · People we support are shown by ClientRef only · Quality data supports supervision conversations, it is not an automated judgement.
         </footer>

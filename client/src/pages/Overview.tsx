@@ -4,6 +4,7 @@ import {
 } from "recharts";
 import { monthLabel, prefersReducedMotion, useApi } from "../api";
 import { CarePackageBars, Card, EmptyState, ErrorNote, KpiCard, NetworkNote, SectionHeading, Spinner } from "../components/ui";
+import { Reveal, Stagger, StaggerItem } from "../components/anim";
 import { useFilters } from "../store";
 import type { OverviewData } from "../types";
 
@@ -54,38 +55,38 @@ export default function Overview() {
 
       {data && (
         <>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-7">
-            <KpiCard label="Incidents" value={data.kpis.incidents} sub={`${data.kpis.notifiable} CQC notifiable`} tone="petrol" />
-            <KpiCard label="High severity" value={data.kpis.highSeverity} sub="incidents in period" tone={data.kpis.highSeverity > 0 ? "amber" : "sage"} />
-            <KpiCard
+          <Stagger className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-7">
+            <StaggerItem className="h-full"><KpiCard label="Incidents" value={data.kpis.incidents} sub={`${data.kpis.notifiable} CQC notifiable`} tone="petrol" /></StaggerItem>
+            <StaggerItem className="h-full"><KpiCard label="High severity" value={data.kpis.highSeverity} sub="incidents in period" tone={data.kpis.highSeverity > 0 ? "amber" : "sage"} /></StaggerItem>
+            <StaggerItem className="h-full"><KpiCard
               label="Reported in 24h"
               value={data.kpis.reported24hPct !== null ? `${data.kpis.reported24hPct}%` : "—"}
               tone={below24h ? "amber" : "sage"}
               target={`Target ${data.targets.reportedWithin24hPct}%${below24h ? "" : " · met"}`}
-            />
-            <KpiCard label="Complaints" value={data.kpis.complaints} sub="received in period" tone="petrol" />
-            <KpiCard
+            /></StaggerItem>
+            <StaggerItem className="h-full"><KpiCard label="Complaints" value={data.kpis.complaints} sub="received in period" tone="petrol" /></StaggerItem>
+            <StaggerItem className="h-full"><KpiCard
               label="Upheld rate"
               value={data.kpis.upheldPct !== null ? `${data.kpis.upheldPct}%` : "—"}
               sub="of decided complaints"
               tone={data.kpis.upheldPct !== null && data.kpis.upheldPct >= 25 ? "amber" : "sage"}
-            />
-            <KpiCard
+            /></StaggerItem>
+            <StaggerItem className="h-full"><KpiCard
               label="Avg feedback"
               value={data.kpis.avgFeedback ?? "—"}
               tone={belowFeedback ? "amber" : "sage"}
               target={`Target ${data.targets.avgFeedback.toFixed(1)} · ${data.kpis.feedbackCount} responses`}
-            />
-            <KpiCard
+            /></StaggerItem>
+            <StaggerItem className="h-full"><KpiCard
               label="Missed sessions"
               value={data.kpis.missedPct !== null ? `${data.kpis.missedPct}%` : "—"}
               tone={data.kpis.missedPct !== null && data.kpis.missedPct >= 1.5 ? "amber" : "sage"}
               sub={`${data.kpis.latePct ?? 0}% late · ${data.kpis.completedVisits.toLocaleString()} delivered`}
-            />
-          </div>
+            /></StaggerItem>
+          </Stagger>
 
           {/* attention summary + trend, 1.4fr / 2fr on wide screens */}
-          <div className="grid gap-4 [grid-template-columns:1fr] xl:[grid-template-columns:1.4fr_2fr]">
+          <Reveal className="grid gap-4 [grid-template-columns:1fr] xl:[grid-template-columns:1.4fr_2fr]">
             <Card className="flex flex-col p-4">
               <div className="flex items-center gap-2.5">
                 <span className="flex h-[26px] w-[26px] items-center justify-center rounded-lg bg-petrol text-sm font-bold text-white">!</span>
@@ -129,9 +130,9 @@ export default function Overview() {
                 </ResponsiveContainer>
               </div>
             </Card>
-          </div>
+          </Reveal>
 
-          <div className="grid gap-4 xl:grid-cols-2">
+          <Reveal className="grid gap-4 xl:grid-cols-2">
             <Card className="p-4">
               <SectionHeading title="Average feedback score by month" sub={`Dashed line marks the ${data.targets.avgFeedback.toFixed(1)} target · people we support`} />
               <div className="h-72" role="img" aria-label="Monthly average feedback score against target">
@@ -208,19 +209,21 @@ export default function Overview() {
                 )}
               </Card>
             </div>
-          </div>
+          </Reveal>
 
           {/* Secondary service context — care package mix. Not part of any risk measure. */}
-          <Card className="p-4">
-            <SectionHeading
-              title="Service mix context"
-              sub="Share of delivered support by care package type. Context only — not a performance measure."
-            />
-            <div className="grid gap-x-8 gap-y-2 md:grid-cols-2">
-              <CarePackageBars rows={data.carePackageMix} metric="sessions" />
-              <CarePackageBars rows={data.carePackageMix} metric="clients" />
-            </div>
-          </Card>
+          <Reveal>
+            <Card className="p-4">
+              <SectionHeading
+                title="Service mix context"
+                sub="Share of delivered support by care package type. Context only — not a performance measure."
+              />
+              <div className="grid gap-x-8 gap-y-2 md:grid-cols-2">
+                <CarePackageBars rows={data.carePackageMix} metric="sessions" />
+                <CarePackageBars rows={data.carePackageMix} metric="clients" />
+              </div>
+            </Card>
+          </Reveal>
         </>
       )}
     </div>

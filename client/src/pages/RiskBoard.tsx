@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { motion, useReducedMotion } from "framer-motion";
 import { useApi } from "../api";
 import { EmptyState, ErrorNote, NetworkNote, Note, RagBadge, SmallSampleTag, Spinner, StrongReporterBadge } from "../components/ui";
 import { useFilters, useMeta } from "../store";
@@ -25,6 +26,11 @@ const LEGEND = [
 export default function RiskBoard() {
   const { team, months } = useFilters();
   const { meta } = useMeta();
+  const reduce = useReducedMotion();
+  const container = { hidden: {}, show: { transition: { staggerChildren: reduce ? 0 : 0.04 } } };
+  const item = reduce
+    ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
+    : { hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } } };
   const [bandFilter, setBandFilter] = useState<string>("All");
   const { data, loading, waking, error, isNetwork, retry } = useApi<{ period: Period; staff: StaffMetrics[] }>(
     `/api/staff?months=${months}&team=${encodeURIComponent(team)}`
@@ -95,9 +101,15 @@ export default function RiskBoard() {
         <EmptyState title="No staff match this view" hint="Try another band or widen the service and period filters above." />
       )}
 
-      <ul className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(300px,1fr))]">
+      <motion.ul
+        className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(300px,1fr))]"
+        variants={container}
+        initial="hidden"
+        animate="show"
+        key={`${team}-${months}-${bandFilter}`}
+      >
         {sorted.map((s) => (
-          <li key={s.StaffID}>
+          <motion.li key={s.StaffID} variants={item}>
             <Link
               to={`/staff/${s.StaffID}`}
               className="block h-full rounded-xl border border-line bg-white p-4 shadow-card transition-shadow hover:shadow-cardhover focus-visible:shadow-cardhover"
@@ -137,9 +149,9 @@ export default function RiskBoard() {
                 </div>
               </dl>
             </Link>
-          </li>
+          </motion.li>
         ))}
-      </ul>
+      </motion.ul>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { CountingNumber } from "./anim";
 
 export function Card({ children, className = "", as: Tag = "div" }: { children: ReactNode; className?: string; as?: "div" | "section" }) {
   return <Tag className={`rounded-xl bg-white shadow-card border border-line ${className}`}>{children}</Tag>;
@@ -50,14 +51,14 @@ export function KpiCard({
 }) {
   return (
     <div
-      className="flex min-w-0 flex-col rounded-xl border border-line bg-white p-4 shadow-card"
+      className="flex h-full min-w-0 flex-col rounded-xl border border-line bg-white p-4 shadow-card"
       style={{ borderTop: `3px solid ${ACCENT[tone]}` }}
     >
       <div className="flex items-center justify-between gap-1.5">
         <span className="text-[11px] font-semibold uppercase tracking-wide text-label">{label}</span>
         <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: ACCENT[tone] }} aria-hidden="true" />
       </div>
-      <span className="mt-2 font-display text-[28px] font-semibold leading-none tabular text-ink">{value}</span>
+      <CountingNumber value={value} className="mt-2 font-display text-[28px] font-semibold leading-none tabular text-ink" />
       {sub && <span className="mt-1.5 text-[11.5px] leading-snug text-muted">{sub}</span>}
       {target && <span className="mt-px text-[11px] text-faint">{target}</span>}
     </div>
