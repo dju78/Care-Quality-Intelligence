@@ -216,10 +216,10 @@ export default function Layout() {
             key={location.pathname}
             id="main"
             className="mx-auto w-full max-w-[1240px] flex-1 px-4 py-7 lg:px-8"
-            initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
+            exit={reduceMotion ? undefined : { opacity: 0, y: -12 }}
+            transition={{ duration: 0.38, ease: "easeOut" }}
           >
             <Outlet />
           </motion.main>

@@ -27,10 +27,10 @@ export default function RiskBoard() {
   const { team, months } = useFilters();
   const { meta } = useMeta();
   const reduce = useReducedMotion();
-  const container = { hidden: {}, show: { transition: { staggerChildren: reduce ? 0 : 0.04 } } };
+  const container = { hidden: {}, show: { transition: { staggerChildren: reduce ? 0 : 0.055, delayChildren: reduce ? 0 : 0.05 } } };
   const item = reduce
     ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
-    : { hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } } };
+    : { hidden: { opacity: 0, y: 26, scale: 0.97 }, show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: "easeOut" } } };
   const [bandFilter, setBandFilter] = useState<string>("All");
   const { data, loading, waking, error, isNetwork, retry } = useApi<{ period: Period; staff: StaffMetrics[] }>(
     `/api/staff?months=${months}&team=${encodeURIComponent(team)}`
@@ -109,7 +109,7 @@ export default function RiskBoard() {
         key={`${team}-${months}-${bandFilter}`}
       >
         {sorted.map((s) => (
-          <motion.li key={s.StaffID} variants={item}>
+          <motion.li key={s.StaffID} variants={item} whileHover={reduce ? undefined : { y: -4 }} transition={{ duration: 0.15 }}>
             <Link
               to={`/staff/${s.StaffID}`}
               className="block h-full rounded-xl border border-line bg-white p-4 shadow-card transition-shadow hover:shadow-cardhover focus-visible:shadow-cardhover"

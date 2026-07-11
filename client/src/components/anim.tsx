@@ -34,8 +34,8 @@ export function useInView<T extends Element = HTMLDivElement>(options: Intersect
 }
 
 export const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
+  hidden: { opacity: 0, y: 30, scale: 0.98 },
+  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
 /** Fade-and-rise a block into view on scroll (Framer Motion `whileInView` uses IntersectionObserver under the hood). */
@@ -47,7 +47,7 @@ export function Reveal({ children, className, delay = 0 }: { children: ReactNode
       className={className}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, amount: 0.2 }}
+      viewport={{ once: true, amount: 0.15 }}
       variants={fadeUp}
       transition={{ delay }}
     >
@@ -65,8 +65,8 @@ export function Stagger({ children, className }: { children: ReactNode; classNam
       className={className}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, amount: 0.15 }}
-      variants={{ hidden: {}, show: { transition: { staggerChildren: 0.06 } } }}
+      viewport={{ once: true, amount: 0.1 }}
+      variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1, delayChildren: 0.05 } } }}
     >
       {children}
     </motion.div>
@@ -88,7 +88,7 @@ export function StaggerItem({ children, className }: { children: ReactNode; clas
  * and counts up from zero once scrolled into view. Renders the value verbatim
  * for reduced-motion users and for non-numeric values (e.g. "—").
  */
-export function CountingNumber({ value, duration = 1.1, className }: { value: string | number; duration?: number; className?: string }) {
+export function CountingNumber({ value, duration = 1.8, className }: { value: string | number; duration?: number; className?: string }) {
   const reduce = useReducedMotion();
   const { ref, inView } = useInView<HTMLSpanElement>({ threshold: 0.4 });
   const raw = String(value);
