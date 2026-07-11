@@ -91,8 +91,8 @@ export default function Cqc() {
         </Link>
       </div>
 
-      {loading && <Spinner label={waking ? "Waking the demo server and loading synthetic data" : "Compiling evidence"} />}
-      {error && (isNetwork ? <NetworkNote onRetry={retry} /> : <ErrorNote message={error} />)}
+      {loading && !data && <Spinner label={waking ? "Waking the demo server and loading synthetic data" : "Compiling evidence"} />}
+      {error && !data && (isNetwork ? <NetworkNote onRetry={retry} /> : <ErrorNote message={error} />)}
 
       {data && meta && (
         <>

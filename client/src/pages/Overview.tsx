@@ -50,8 +50,8 @@ export default function Overview() {
 
   return (
     <div className="space-y-5">
-      {loading && <Spinner label={waking ? "Waking the demo server and loading synthetic data" : "Loading overview"} />}
-      {error && (isNetwork ? <NetworkNote onRetry={retry} /> : <ErrorNote message={error} />)}
+      {loading && !data && <Spinner label={waking ? "Waking the demo server and loading synthetic data" : "Loading overview"} />}
+      {error && !data && (isNetwork ? <NetworkNote onRetry={retry} /> : <ErrorNote message={error} />)}
 
       {data && (
         <>

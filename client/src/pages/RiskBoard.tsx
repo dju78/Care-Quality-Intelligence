@@ -94,19 +94,21 @@ export default function RiskBoard() {
         ))}
       </div>
 
-      {loading && <Spinner label={waking ? "Waking the demo server and loading synthetic data" : "Ranking staff"} />}
-      {error && (isNetwork ? <NetworkNote onRetry={retry} /> : <ErrorNote message={error} />)}
+      {loading && !data && <Spinner label={waking ? "Waking the demo server and loading synthetic data" : "Ranking staff"} />}
+      {error && !data && (isNetwork ? <NetworkNote onRetry={retry} /> : <ErrorNote message={error} />)}
 
       {data && sorted.length === 0 && (
         <EmptyState title="No staff match this view" hint="Try another band or widen the service and period filters above." />
       )}
 
+      {/* Key on data-presence so tiles stagger once when data first arrives;
+          filter changes update in place (no remount, no re-stagger). */}
       <motion.ul
+        key={data ? "loaded" : "loading"}
         className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(300px,1fr))]"
         variants={container}
         initial="hidden"
         animate="show"
-        key={`${team}-${months}-${bandFilter}`}
       >
         {sorted.map((s) => (
           <motion.li key={s.StaffID} variants={item} whileHover={reduce ? undefined : { y: -4 }} transition={{ duration: 0.15 }}>

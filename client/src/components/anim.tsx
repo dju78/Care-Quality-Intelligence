@@ -84,13 +84,15 @@ export function StaggerItem({ children, className }: { children: ReactNode; clas
 }
 
 /**
- * Animated KPI number. Parses an optional prefix/suffix (e.g. "92%", "4.05")
- * and counts up from zero once scrolled into view. Renders the value verbatim
- * for reduced-motion users and for non-numeric values (e.g. "—").
+ * Animated KPI number. Parses an optional prefix/suffix (e.g. "92%", "4.05").
+ * Counts up 0 → value once when it first mounts (i.e. after data loads), then —
+ * thanks to `preserveValue` — animates smoothly from the previous value to the
+ * new one when a filter changes, rather than restarting from zero. It does not
+ * re-run on scroll or on unrelated re-renders. Renders verbatim for
+ * reduced-motion users and for non-numeric values (e.g. "—").
  */
-export function CountingNumber({ value, duration = 1.8, className }: { value: string | number; duration?: number; className?: string }) {
+export function CountingNumber({ value, duration = 1.6, className }: { value: string | number; duration?: number; className?: string }) {
   const reduce = useReducedMotion();
-  const { ref, inView } = useInView<HTMLSpanElement>({ threshold: 0.4 });
   const raw = String(value);
   const match = raw.match(/^(\D*?)(-?\d+(?:\.\d+)?)(\D*)$/);
   if (!match || reduce) return <span className={className}>{raw}</span>;
@@ -98,12 +100,8 @@ export function CountingNumber({ value, duration = 1.8, className }: { value: st
   const num = parseFloat(digits);
   const decimals = digits.includes(".") ? digits.split(".")[1].length : 0;
   return (
-    <span ref={ref} className={className}>
-      {inView ? (
-        <CountUp end={num} duration={duration} decimals={decimals} separator="," prefix={prefix} suffix={suffix} />
-      ) : (
-        `${prefix}0${decimals ? "." + "0".repeat(decimals) : ""}${suffix}`
-      )}
+    <span className={className}>
+      <CountUp end={num} duration={duration} decimals={decimals} separator="," prefix={prefix} suffix={suffix} preserveValue />
     </span>
   );
 }
